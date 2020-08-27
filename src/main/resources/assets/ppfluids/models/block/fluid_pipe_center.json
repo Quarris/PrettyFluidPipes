@@ -1,3 +1,6 @@
 {
-
+    "parent": "prettypipes:block/pipe_center",
+    "textures": {
+        "0": "ppfluids:block/fluid_pipe"
+    }
 }
