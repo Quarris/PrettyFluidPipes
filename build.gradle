@@ -13,7 +13,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '1.0'
+version = '0.1'
 group = 'quarris.ppfluids' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'PrettyFluidPipes'
 
@@ -95,8 +95,8 @@ repositories {
 
 dependencies {
     minecraft 'net.minecraftforge:forge:1.15.2-31.2.0'
-    compile fg.deobf('de.ellpeck.prettypipes:PrettyPipes:1.5.4.98')
-    runtimeOnly fg.deobf('not_used:VoidTanks-1.15.2:1.0')
+    compile fg.deobf('de.ellpeck.prettypipes:PrettyPipes:1.5.4.100')
+    runtimeOnly fg.deobf('not_used:VoidTanks-1.15.2:1.1')
 
 }
 

@@ -52,6 +52,6 @@ description='''
 [[dependencies.ppfluids]]
 modId="prettypipes"
 mandatory=true
-versionRange="[1.5.4.98]"
+versionRange="[1.5.4.100]"
 ordering="NONE"
 side="BOTH"
