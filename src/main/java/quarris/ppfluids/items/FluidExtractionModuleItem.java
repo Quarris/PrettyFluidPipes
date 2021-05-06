@@ -10,6 +10,7 @@ import net.minecraft.util.Direction;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import quarris.ppfluids.network.FluidPipeItem;
+import quarris.ppfluids.network.PipeNetworkUtil;
 import quarris.ppfluids.pipe.FluidPipeTileEntity;
 
 public class FluidExtractionModuleItem extends ModuleItem {
@@ -41,19 +42,20 @@ public class FluidExtractionModuleItem extends ModuleItem {
 
         PipeNetwork network = PipeNetwork.get(tile.getWorld());
         for (Direction dir : Direction.values()) {
-            IFluidHandler handler = fluidPipe.getFluidHandler(dir, null);
-            if (handler == null)
+            IFluidHandler tank = fluidPipe.getAdjacentFluidHandler(dir);
+            if (tank == null)
                 continue;
 
-            FluidStack fluid = handler.drain(this.maxExtraction, IFluidHandler.FluidAction.SIMULATE);
+            FluidStack fluid = tank.drain(this.maxExtraction, IFluidHandler.FluidAction.SIMULATE);
             if (fluid.isEmpty())
                 continue;
             //if (!filter.isAllowed(stack))
-                //continue;
-            ItemStack remain = network.routeItem(tile.getPos(), tile.getPos().offset(dir), FluidItem.createItemFromFluid(fluid), FluidPipeItem::new, this.preventOversending);
-            FluidStack remainedFluid = FluidItem.createFluidFromItem(remain);
-            if (remainedFluid.getAmount() != fluid.getAmount()) {
-                handler.drain(fluid.getAmount() - remainedFluid.getAmount(), IFluidHandler.FluidAction.EXECUTE);
+            //continue;
+
+            FluidStack remain = PipeNetworkUtil.routeFluid(fluidPipe.getWorld(), fluidPipe.getPos(), fluidPipe.getPos().offset(dir), fluid, FluidPipeItem::new, this.preventOversending);
+
+            if (remain.getAmount() != fluid.getAmount()) {
+                tank.drain(fluid.getAmount() - remain.getAmount(), IFluidHandler.FluidAction.EXECUTE);
                 return;
             }
         }

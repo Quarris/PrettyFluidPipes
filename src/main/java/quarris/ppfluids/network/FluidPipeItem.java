@@ -1,126 +1,74 @@
 package quarris.ppfluids.network;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.IVertexBuilder;
 import de.ellpeck.prettypipes.Utility;
 import de.ellpeck.prettypipes.network.PipeItem;
 import de.ellpeck.prettypipes.pipe.IPipeConnectable;
 import de.ellpeck.prettypipes.pipe.PipeTileEntity;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.model.Model;
+import net.minecraft.client.renderer.model.ModelRenderer;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.fluid.Fluid;
+import net.minecraft.inventory.container.PlayerContainer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Direction;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.World;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import quarris.ppfluids.items.FluidItem;
 import quarris.ppfluids.pipe.FluidPipeTileEntity;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
+import java.util.Random;
 
 public class FluidPipeItem extends PipeItem {
 
-    protected static Field lastWorldTick = ObfuscationReflectionHelper.findField(PipeItem.class, "lastWorldTick");
-    protected static Field startInventory = ObfuscationReflectionHelper.findField(PipeItem.class, "startInventory");
-    protected static Field currGoalPos = ObfuscationReflectionHelper.findField(PipeItem.class, "currGoalPos");
-
-    protected static Method getNextTile = ObfuscationReflectionHelper.findMethod(PipeItem.class, "getNextTile", PipeTileEntity.class, boolean.class);
-    protected static Method onPathObstructed = ObfuscationReflectionHelper.findMethod(PipeItem.class, "onPathObstructed", PipeTileEntity.class, boolean.class);
+    public static final ResourceLocation TYPE = new ResourceLocation("prettypipes", "pipe_fluid");
 
     public FluidPipeItem(ItemStack stack, float speed) {
-        super(stack, speed);
+        super(TYPE, stack, speed);
     }
 
     public FluidPipeItem(CompoundNBT nbt) {
-        super(nbt);
+        this(TYPE, nbt);
     }
-/*
-    @Override
-    public void updateInPipe(PipeTileEntity currPipe) {
-        long worldTick = currPipe.getWorld().getGameTime();
 
-        try {
-            if (lastWorldTick.getLong(this) != worldTick) {
-                lastWorldTick.setLong(this, worldTick);
-                float currSpeed = this.speed;
-                BlockPos myPos = new BlockPos(this.x, this.y, this.z);
-                if (!myPos.equals(currPipe.getPos()) && (currPipe.getPos().equals(this.getDestPipe()) || !myPos.equals(startInventory.get(this)))) {
-                    currPipe.getItems().remove(this);
-                    PipeTileEntity next = (PipeTileEntity) getNextTile.invoke(this, currPipe, true);
-                    if (next == null) {
-                        if (!currPipe.getWorld().isRemote) {
-                            if (currPipe.getPos().equals(this.getDestPipe())) {
-                                this.stack = this.store(currPipe);
-                                if (!this.stack.isEmpty()) {
-                                    onPathObstructed.invoke(this, currPipe, true);
-                                }
-                            } else {
-                                onPathObstructed.invoke(this, currPipe, false);
-                            }
-                        }
+    public FluidPipeItem(ResourceLocation type, CompoundNBT nbt) {
+        super(type, nbt);
+    }
 
-                        return;
-                    }
-
-                    next.getItems().add(this);
-                } else {
-                    double dist = (new Vec3d((BlockPos) currGoalPos.get(this))).squareDistanceTo((this.x - 0.5F), (this.y - 0.5F), (this.z - 0.5F));
-                    if (dist < (double)(this.speed * this.speed)) {
-                        PipeTileEntity next = (PipeTileEntity) getNextTile.invoke(this, currPipe, false);
-                        BlockPos nextPos;
-                        if (next == null) {
-                            if (!currPipe.getPos().equals(this.getDestPipe())) {
-                                currPipe.getItems().remove(this);
-                                if (!currPipe.getWorld().isRemote) {
-                                    onPathObstructed.invoke(this, currPipe, false);
-                                }
-
-                                return;
-                            }
-
-                            nextPos = this.getDestInventory();
-                        } else {
-                            nextPos = next.getPos();
-                        }
-
-                        float tolerance = 0.001F;
-                        if (dist >= (double)(tolerance * tolerance)) {
-                            Vec3d motion = new Vec3d(this.x - this.lastX, this.y - this.lastY, this.z - this.lastZ);
-                            Vec3d diff = new Vec3d((float)nextPos.getX() + 0.5F - this.x, (float)nextPos.getY() + 0.5F - this.y, (float)nextPos.getZ() + 0.5F - this.z);
-                            if (motion.crossProduct(diff).length() >= (double)tolerance) {
-                                currSpeed = (float)Math.sqrt(dist);
-                            } else {
-                                currGoalPos.set(this, nextPos);
-                            }
-                        } else {
-                            currGoalPos.set(this, nextPos);
-                        }
-                    }
-                }
-
-                this.lastX = this.x;
-                this.lastY = this.y;
-                this.lastZ = this.z;
-                BlockPos currentBlockPos = (BlockPos)currGoalPos.get(this);
-                Vec3d dist = new Vec3d((float)currentBlockPos.getX() + 0.5F - this.x, (float)currentBlockPos.getY() + 0.5F - this.y, (float)currentBlockPos.getZ() + 0.5F - this.z);
-                dist = dist.normalize();
-                this.x = (float)(this.x + dist.x * currSpeed);
-                this.y = (float)(this.y + dist.y * currSpeed);
-                this.z = (float)(this.z + dist.z * currSpeed);
-            }
-        } catch (Exception e) {
-            PPFluids.LOGGER.error(e);
+    public FluidStack getFluidContent() {
+        IFluidHandlerItem tank = FluidUtil.getFluidHandler(this.stack).orElse(null);
+        if (tank != null) {
+            return tank.getFluidInTank(0);
         }
+        return FluidStack.EMPTY;
     }
 
- */
+    @Override
+    public void drop(World world, ItemStack stack) {
+        // Drop fluid??
+        super.drop(world, stack);
+    }
+
     @Override
     protected ItemStack store(PipeTileEntity currPipe) {
         if (currPipe instanceof FluidPipeTileEntity) {
             FluidPipeTileEntity currFluidPipe = (FluidPipeTileEntity) currPipe;
             Direction dir = Utility.getDirectionFromOffset(this.getDestInventory(), this.getDestPipe());
-            IPipeConnectable connectable = currPipe.getPipeConnectable(dir);
+            IPipeConnectable connectable = currFluidPipe.getPipeConnectable(dir);
             if (connectable != null) {
-                return connectable.insertItem(currPipe.getWorld(), currPipe.getPos(), dir, this);
+                return connectable.insertItem(currFluidPipe.getPos(), dir, this.stack, false);
             } else {
-                IFluidHandler handler = currFluidPipe.getFluidHandler(dir, this);
+                IFluidHandler handler = currFluidPipe.getAdjacentFluidHandler(dir);
                 if (handler == null)
                     return this.stack;
 
@@ -131,5 +79,44 @@ public class FluidPipeItem extends PipeItem {
         return ItemStack.EMPTY;
     }
 
+    @Override
+    public void render(PipeTileEntity tile, MatrixStack matrixStack, Random random, float partialTicks, int light, int overlay, IRenderTypeBuffer buffer) {
+        FluidStack fluidStack = this.getFluidContent();
+        Fluid fluid = fluidStack.getFluid();
+        float size = MathHelper.lerp(Math.min(1, fluidStack.getAmount() / 2000f), 0.2f, 1f);
+        int color = fluid.getAttributes().getColor(fluidStack);
+        float r = ((color >> 16) & 0xFF) / 255f; // red
+        float g = ((color >> 8) & 0xFF) / 255f; // green
+        float b = ((color >> 0) & 0xFF) / 255f; // blue
+        float a = ((color >> 24) & 0xFF) / 255f; // alpha
 
+        // TODO Cache the model for each fluid pipe item until the item has changed
+        TextureAtlasSprite sprite = getFluidStillSprite(fluid);
+        FluidBlobModel model = new FluidBlobModel(sprite, size);
+        matrixStack.translate(this.x, this.y, this.z);
+        model.render(matrixStack, buffer.getBuffer(RenderType.getEntityTranslucent(sprite.getAtlasTexture().getTextureLocation())), light, overlay, r, g, b, a);
+    }
+
+    private static TextureAtlasSprite getFluidStillSprite(Fluid fluid) {
+        return Minecraft.getInstance()
+                .getAtlasSpriteGetter(PlayerContainer.LOCATION_BLOCKS_TEXTURE)
+                .apply(fluid.getAttributes().getStillTexture());
+    }
+
+    public static class FluidBlobModel extends Model {
+        private TextureAtlasSprite sprite;
+        private ModelRenderer blob;
+
+        public FluidBlobModel(TextureAtlasSprite sprite, float size) {
+            super(RenderType::getEntityCutout);
+            this.sprite = sprite;
+            this.blob = new ModelRenderer(this);
+            this.blob.setTextureOffset(0, 0).addBox(-8, -8, -8, 16, 16, 16, -8 + size * 2);
+        }
+
+        @Override
+        public void render(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
+            this.blob.render(matrixStackIn, sprite.wrapBuffer(bufferIn), packedLightIn, packedOverlayIn, red, green, blue, alpha);
+        }
+    }
 }

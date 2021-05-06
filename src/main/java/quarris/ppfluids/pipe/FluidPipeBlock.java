@@ -1,9 +1,9 @@
 package quarris.ppfluids.pipe;
 
+import de.ellpeck.prettypipes.Registry;
 import de.ellpeck.prettypipes.pipe.ConnectionType;
 import de.ellpeck.prettypipes.pipe.IPipeConnectable;
 import de.ellpeck.prettypipes.pipe.PipeBlock;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
@@ -24,21 +24,28 @@ public class FluidPipeBlock extends PipeBlock {
         BlockPos offset = pos.offset(direction);
         if (!world.isBlockLoaded(offset)) {
             return ConnectionType.DISCONNECTED;
-        } else {
-            BlockState offState = world.getBlockState(offset);
-            Block block = offState.getBlock();
-            if (block instanceof IPipeConnectable) {
-                return ((IPipeConnectable)block).getConnectionType(world, pos, direction);
-            } else {
-                TileEntity tile = world.getTileEntity(offset);
-                if (tile != null) {
-                    if (tile.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction.getOpposite()).isPresent()) {
-                        return ConnectionType.CONNECTED;
-                    }
-                }
+        }
 
-                return hasLegsTo(world, offState, offset, direction) && DIRECTIONS.values().stream().noneMatch((d) -> state.get(d) == ConnectionType.LEGS) ? ConnectionType.LEGS : ConnectionType.DISCONNECTED;
+        Direction opposite = direction.getOpposite();
+
+        TileEntity tile = world.getTileEntity(offset);
+        if (tile != null) {
+            IPipeConnectable connectable = tile.getCapability(Registry.pipeConnectableCapability, opposite).orElse(null);
+            if (connectable != null)
+                return connectable.getConnectionType(pos, direction);
+
+            if (tile.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, opposite).isPresent()) {
+                return ConnectionType.CONNECTED;
             }
         }
+
+        BlockState offState = world.getBlockState(offset);
+        if (hasLegsTo(world, offState, offset, direction)) {
+            if (DIRECTIONS.values().stream().noneMatch((d) -> state.get(d) == ConnectionType.LEGS)) {
+                return ConnectionType.LEGS;
+            }
+        }
+
+        return ConnectionType.DISCONNECTED;
     }
 }

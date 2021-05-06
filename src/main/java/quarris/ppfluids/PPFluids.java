@@ -19,7 +19,7 @@ public class PPFluids {
     }
 
     public PPFluids() {
-        DistExecutor.callWhenOn(Dist.CLIENT, () -> () -> {
+        DistExecutor.unsafeCallWhenOn(Dist.CLIENT, () -> () -> {
             FMLJavaModLoadingContext.get().getModEventBus().addListener(ClientSetup::setup);
             return null;
         });

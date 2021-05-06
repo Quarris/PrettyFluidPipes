@@ -14,8 +14,8 @@ apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
 version = '0.1'
-group = 'quarris.ppfluids' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = 'PrettyFluidPipes'
+group = 'dev.quarris.ppfluids' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = 'PrettyPipesFluids'
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
@@ -25,7 +25,7 @@ minecraft {
     // stable_#            Stables are built at the discretion of the MCP team.
     // Use non-default mappings at your own risk. they may not always work.
     // Simply re-run your setup task after changing the mappings to update your workspace.
-    mappings channel: 'snapshot', version: '20200128-1.15.1'
+    mappings channel: 'snapshot', version: '20201028-1.16.3'
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
     
     // accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
@@ -94,9 +94,10 @@ repositories {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.15.2-31.2.0'
-    compile fg.deobf('de.ellpeck.prettypipes:PrettyPipes:1.5.4.100')
-    runtimeOnly fg.deobf('not_used:VoidTanks-1.15.2:1.1')
+    minecraft 'net.minecraftforge:forge:1.16.5-36.0.43'
+    compile fg.deobf('de.ellpeck.prettypipes:PrettyPipes:1.9.3.28')
+    runtimeOnly fg.deobf('not_used:VoidTanks-1.16.4:1.2')
+    runtimeOnly fg.deobf('not_used:jei-1.16.5:7.6.4.90')
 
 }
 

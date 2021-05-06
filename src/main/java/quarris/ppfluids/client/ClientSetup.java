@@ -10,8 +10,7 @@ import quarris.ppfluids.ModContent;
 public class ClientSetup {
 
     public static void setup(FMLClientSetupEvent event) {
-        RenderTypeLookup.setRenderLayer(ModContent.FLUID_PIPE, RenderType.cutout());
-
+        RenderTypeLookup.setRenderLayer(ModContent.FLUID_PIPE, RenderType.getCutout());
         ClientRegistry.bindTileEntityRenderer(ModContent.FLUID_PIPE_TILE, PipeRenderer::new);
     }
 

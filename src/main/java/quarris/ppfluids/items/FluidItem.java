@@ -2,37 +2,40 @@ package quarris.ppfluids.items;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidHandlerItem;
+import net.minecraftforge.fluids.capability.ItemFluidContainer;
+import net.minecraftforge.fluids.capability.templates.FluidHandlerItemStack;
 import quarris.ppfluids.ModContent;
+import quarris.ppfluids.client.FluidISTER;
 
-public class FluidItem extends Item {
+public class FluidItem extends ItemFluidContainer {
 
     public FluidItem() {
-        super(new Item.Properties());
+        super(new Item.Properties().setISTER(() -> FluidISTER::new), Integer.MAX_VALUE);
     }
 
     public static ItemStack createItemFromFluid(FluidStack fluid) {
         ItemStack item =  new ItemStack(ModContent.FLUID_ITEM);
-        item.getOrCreateTag().put("Fluid", fluid.writeToNBT(new CompoundNBT()));
+        IFluidHandlerItem tank = FluidUtil.getFluidHandler(item).orElse(null);
+        if (tank != null) {
+            tank.fill(fluid, IFluidHandler.FluidAction.EXECUTE);
+        }
         return item;
     }
 
-    public static FluidStack createFluidFromItem(ItemStack item) {
-        if (item.isEmpty())
-            return FluidStack.EMPTY;
-
-        CompoundNBT nbt = item.getChildTag("Fluid");
-        if (nbt != null) {
-            return FluidStack.loadFluidStackFromNBT(nbt);
+    public static FluidStack getFluidCopyFromItem(ItemStack item) {
+        IFluidHandlerItem handler = FluidUtil.getFluidHandler(item).orElse(null);
+        if (handler != null) {
+            return handler.getFluidInTank(0).copy();
         }
-
         return FluidStack.EMPTY;
     }
 
     public static ItemStack insertFluid(IFluidHandler handler, ItemStack fluidItem, boolean simulate) {
-        FluidStack fluidStack = FluidItem.createFluidFromItem(fluidItem);
+        FluidStack fluidStack = FluidItem.getFluidCopyFromItem(fluidItem);
         int filled = handler.fill(fluidStack, simulate ? IFluidHandler.FluidAction.SIMULATE : IFluidHandler.FluidAction.EXECUTE);
         fluidStack.shrink(filled);
 
@@ -40,5 +43,9 @@ public class FluidItem extends Item {
             return ItemStack.EMPTY;
 
         return FluidItem.createItemFromFluid(fluidStack);
+    }
+
+    public static IFluidHandlerItem createFluidHandler(ItemStack stack) {
+        return new FluidHandlerItemStack(stack, Integer.MAX_VALUE);
     }
 }

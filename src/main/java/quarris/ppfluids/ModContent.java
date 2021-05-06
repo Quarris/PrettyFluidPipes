@@ -3,6 +3,7 @@ package quarris.ppfluids;
 import de.ellpeck.prettypipes.Registry;
 import de.ellpeck.prettypipes.items.ModuleItem;
 import de.ellpeck.prettypipes.items.ModuleTier;
+import de.ellpeck.prettypipes.pipe.IPipeItem;
 import net.minecraft.block.Block;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
@@ -11,6 +12,7 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import quarris.ppfluids.items.FluidExtractionModuleItem;
+import quarris.ppfluids.network.FluidPipeItem;
 import quarris.ppfluids.pipe.FluidPipeBlock;
 import quarris.ppfluids.items.FluidItem;
 import quarris.ppfluids.pipe.FluidPipeTileEntity;
@@ -44,6 +46,7 @@ public class ModContent {
         );
 
         event.getRegistry().registerAll(createTieredModule("fluid_extraction_module", FluidExtractionModuleItem::new));
+        IPipeItem.TYPES.put(FluidPipeItem.TYPE, FluidPipeItem::new);
     }
 
     @SubscribeEvent
