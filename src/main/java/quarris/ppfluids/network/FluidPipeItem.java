@@ -90,7 +90,7 @@ public class FluidPipeItem extends PipeItem {
             }
         }
 
-        return ItemStack.EMPTY;
+        return super.store(currPipe);
     }
 
     @Override

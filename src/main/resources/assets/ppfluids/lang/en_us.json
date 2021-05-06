@@ -1,0 +1,7 @@
+{
+    "item.ppfluids.fluid_item": "Fluid Container",
+    "item.ppfluids.low_fluid_extraction_module": "Low Fluid Extraction Module",
+    "item.ppfluids.medium_fluid_extraction_module": "Medium Fluid Extraction Module",
+    "item.ppfluids.high_fluid_extraction_module": "High Fluid Extraction Module",
+    "info.prettypipes.fluid_extraction_module": "Pulls fluid from adjacent inventories\nFilters and pull rates vary by tier\nHigh tiers prevent over-sending"
+}
