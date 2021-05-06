@@ -32,9 +32,17 @@ import java.util.Random;
 public class FluidPipeItem extends PipeItem {
 
     public static final ResourceLocation TYPE = new ResourceLocation("prettypipes", "pipe_fluid");
+    private final ResourceLocation modelTexture;
+    private final FluidBlobModel model;
 
     public FluidPipeItem(ItemStack stack, float speed) {
         super(TYPE, stack, speed);
+        FluidStack fluidStack = this.getFluidContent();
+        Fluid fluid = fluidStack.getFluid();
+        float size = MathHelper.lerp(Math.min(1, fluidStack.getAmount() / 2000f), 0.2f, 1f);
+        TextureAtlasSprite sprite = getFluidStillSprite(fluid);
+        this.model = new FluidBlobModel(sprite, size);
+        this.modelTexture = sprite.getAtlasTexture().getTextureLocation();
     }
 
     public FluidPipeItem(CompoundNBT nbt) {
@@ -43,6 +51,12 @@ public class FluidPipeItem extends PipeItem {
 
     public FluidPipeItem(ResourceLocation type, CompoundNBT nbt) {
         super(type, nbt);
+        FluidStack fluidStack = this.getFluidContent();
+        Fluid fluid = fluidStack.getFluid();
+        float size = MathHelper.lerp(Math.min(1, fluidStack.getAmount() / 2000f), 0.2f, 1f);
+        TextureAtlasSprite sprite = getFluidStillSprite(fluid);
+        this.model = new FluidBlobModel(sprite, size);
+        this.modelTexture = sprite.getAtlasTexture().getTextureLocation();
     }
 
     public FluidStack getFluidContent() {
@@ -83,18 +97,14 @@ public class FluidPipeItem extends PipeItem {
     public void render(PipeTileEntity tile, MatrixStack matrixStack, Random random, float partialTicks, int light, int overlay, IRenderTypeBuffer buffer) {
         FluidStack fluidStack = this.getFluidContent();
         Fluid fluid = fluidStack.getFluid();
-        float size = MathHelper.lerp(Math.min(1, fluidStack.getAmount() / 2000f), 0.2f, 1f);
         int color = fluid.getAttributes().getColor(fluidStack);
         float r = ((color >> 16) & 0xFF) / 255f; // red
         float g = ((color >> 8) & 0xFF) / 255f; // green
         float b = ((color >> 0) & 0xFF) / 255f; // blue
         float a = ((color >> 24) & 0xFF) / 255f; // alpha
 
-        // TODO Cache the model for each fluid pipe item until the item has changed
-        TextureAtlasSprite sprite = getFluidStillSprite(fluid);
-        FluidBlobModel model = new FluidBlobModel(sprite, size);
         matrixStack.translate(this.x, this.y, this.z);
-        model.render(matrixStack, buffer.getBuffer(RenderType.getEntityTranslucent(sprite.getAtlasTexture().getTextureLocation())), light, overlay, r, g, b, a);
+        this.model.render(matrixStack, buffer.getBuffer(RenderType.getEntityTranslucent(this.modelTexture)), light, overlay, r, g, b, a);
     }
 
     private static TextureAtlasSprite getFluidStillSprite(Fluid fluid) {

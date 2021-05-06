@@ -7,7 +7,6 @@ import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.minecraftforge.fluids.capability.ItemFluidContainer;
-import net.minecraftforge.fluids.capability.templates.FluidHandlerItemStack;
 import quarris.ppfluids.ModContent;
 import quarris.ppfluids.client.FluidISTER;
 
@@ -43,9 +42,5 @@ public class FluidItem extends ItemFluidContainer {
             return ItemStack.EMPTY;
 
         return FluidItem.createItemFromFluid(fluidStack);
-    }
-
-    public static IFluidHandlerItem createFluidHandler(ItemStack stack) {
-        return new FluidHandlerItemStack(stack, Integer.MAX_VALUE);
     }
 }
