@@ -1,4 +1,5 @@
 {
+    "block.ppfluids.fluid_pipe": "Fluid Pipe",
     "item.ppfluids.fluid_item": "Fluid Container",
     "item.ppfluids.low_fluid_extraction_module": "Low Fluid Extraction Module",
     "item.ppfluids.medium_fluid_extraction_module": "Medium Fluid Extraction Module",
