@@ -1,4 +1,4 @@
-package quarris.ppfluids;
+package dev.quarris.ppfluids;
 
 import de.ellpeck.prettypipes.Registry;
 import de.ellpeck.prettypipes.items.ModuleItem;
@@ -11,11 +11,11 @@ import net.minecraft.tileentity.TileEntityType;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import quarris.ppfluids.items.FluidExtractionModuleItem;
-import quarris.ppfluids.network.FluidPipeItem;
-import quarris.ppfluids.pipe.FluidPipeBlock;
-import quarris.ppfluids.items.FluidItem;
-import quarris.ppfluids.pipe.FluidPipeTileEntity;
+import dev.quarris.ppfluids.items.FluidExtractionModuleItem;
+import dev.quarris.ppfluids.network.FluidPipeItem;
+import dev.quarris.ppfluids.pipe.FluidPipeBlock;
+import dev.quarris.ppfluids.items.FluidItem;
+import dev.quarris.ppfluids.pipe.FluidPipeTileEntity;
 
 import java.util.ArrayList;
 import java.util.List;

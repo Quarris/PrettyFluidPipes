@@ -1,4 +1,4 @@
-package quarris.ppfluids.network;
+package dev.quarris.ppfluids.network;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
@@ -24,8 +24,8 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
-import quarris.ppfluids.items.FluidItem;
-import quarris.ppfluids.pipe.FluidPipeTileEntity;
+import dev.quarris.ppfluids.items.FluidItem;
+import dev.quarris.ppfluids.pipe.FluidPipeTileEntity;
 
 import java.util.Random;
 
@@ -69,7 +69,6 @@ public class FluidPipeItem extends PipeItem {
 
     @Override
     public void drop(World world, ItemStack stack) {
-        // Drop fluid??
         super.drop(world, stack);
     }
 

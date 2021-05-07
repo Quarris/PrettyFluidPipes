@@ -1,4 +1,4 @@
-package quarris.ppfluids;
+package dev.quarris.ppfluids;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
@@ -7,7 +7,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import quarris.ppfluids.client.ClientSetup;
+import dev.quarris.ppfluids.client.ClientSetup;
 
 @Mod(PPFluids.ID)
 public class PPFluids {

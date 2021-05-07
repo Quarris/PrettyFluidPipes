@@ -1,4 +1,4 @@
-package quarris.ppfluids.pipe;
+package dev.quarris.ppfluids.pipe;
 
 import de.ellpeck.prettypipes.network.PipeNetwork;
 import de.ellpeck.prettypipes.pipe.IPipeItem;
@@ -11,9 +11,9 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import org.apache.commons.lang3.tuple.Pair;
-import quarris.ppfluids.ModContent;
-import quarris.ppfluids.items.FluidItem;
-import quarris.ppfluids.network.FluidPipeItem;
+import dev.quarris.ppfluids.ModContent;
+import dev.quarris.ppfluids.items.FluidItem;
+import dev.quarris.ppfluids.network.FluidPipeItem;
 
 import java.util.List;
 
@@ -23,19 +23,18 @@ public class FluidPipeTileEntity extends PipeTileEntity {
         super(ModContent.FLUID_PIPE_TILE);
     }
 
-    @Override
-    public Pair<BlockPos, ItemStack> getAvailableDestination(ItemStack stack, boolean force, boolean preventOversending) {
+    public Pair<BlockPos, ItemStack> getAvailableDestination(FluidStack fluid, boolean force, boolean preventOversending) {
+
         if (!this.canWork()) {
             return null;
         }
-        if (!force && this.streamModules().anyMatch(m -> !(m.getRight()).canAcceptItem(m.getLeft(), this, stack))) {
+        if (!force && this.streamModules().anyMatch(m -> !(m.getRight()).canAcceptItem(m.getLeft(), this, FluidItem.createItemFromFluid(fluid)))) {
             return null;
         }
 
         for (Direction dir : Direction.values()) {
             IFluidHandler tank = this.getAdjacentFluidHandler(dir);
             if (tank != null) {
-                FluidStack fluid = FluidItem.getFluidCopyFromItem(stack);
                 int amountFilled = tank.fill(fluid, IFluidHandler.FluidAction.SIMULATE);
                 if (amountFilled > 0) {
                     FluidStack toInsert = fluid.copy();
@@ -74,6 +73,11 @@ public class FluidPipeTileEntity extends PipeTileEntity {
             }
         }
 
+        return null;
+    }
+
+    @Override
+    public Pair<BlockPos, ItemStack> getAvailableDestination(ItemStack stack, boolean force, boolean preventOversending) {
         return null;
     }
 

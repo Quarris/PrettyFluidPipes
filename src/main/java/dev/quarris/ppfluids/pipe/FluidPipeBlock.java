@@ -1,4 +1,4 @@
-package quarris.ppfluids.pipe;
+package dev.quarris.ppfluids.pipe;
 
 import de.ellpeck.prettypipes.Registry;
 import de.ellpeck.prettypipes.pipe.ConnectionType;

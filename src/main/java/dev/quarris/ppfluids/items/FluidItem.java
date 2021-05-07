@@ -1,16 +1,10 @@
-package quarris.ppfluids.items;
+package dev.quarris.ppfluids.items;
 
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
@@ -23,7 +17,7 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.minecraftforge.fluids.capability.ItemFluidContainer;
 import net.minecraftforge.fluids.capability.templates.FluidHandlerItemStack;
-import quarris.ppfluids.ModContent;
+import dev.quarris.ppfluids.ModContent;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -38,6 +32,7 @@ public class FluidItem extends ItemFluidContainer {
     @OnlyIn(Dist.CLIENT)
     @Override
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+        tooltip.add(new TranslationTextComponent("info.ppfluids.fluid_item.usage"));
         FluidStack fluidStack = getFluidCopyFromItem(stack);
         tooltip.add(new TranslationTextComponent(fluidStack.getTranslationKey())
                 .appendString(": ").appendString(String.valueOf(fluidStack.getAmount())));

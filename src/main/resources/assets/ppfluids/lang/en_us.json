@@ -4,5 +4,6 @@
     "item.ppfluids.low_fluid_extraction_module": "Low Fluid Extraction Module",
     "item.ppfluids.medium_fluid_extraction_module": "Medium Fluid Extraction Module",
     "item.ppfluids.high_fluid_extraction_module": "High Fluid Extraction Module",
-    "info.prettypipes.fluid_extraction_module": "Pulls fluid from adjacent inventories\nFilters and pull rates vary by tier\nHigh tiers prevent over-sending"
+    "info.prettypipes.fluid_extraction_module": "Pulls fluid from adjacent inventories\nFilters and pull rates vary by tier\nHigh tiers prevent over-sending",
+    "info.ppfluids.fluid_item.usage": "Right Click me on a fluid tank to input my contents into it!"
 }

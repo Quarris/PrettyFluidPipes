@@ -1,4 +1,4 @@
-package quarris.ppfluids.network;
+package dev.quarris.ppfluids.network;
 
 import de.ellpeck.prettypipes.network.PipeNetwork;
 import de.ellpeck.prettypipes.pipe.IPipeItem;
@@ -8,8 +8,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidStack;
 import org.apache.commons.lang3.tuple.Pair;
-import quarris.ppfluids.items.FluidItem;
-import quarris.ppfluids.pipe.FluidPipeTileEntity;
+import dev.quarris.ppfluids.items.FluidItem;
+import dev.quarris.ppfluids.pipe.FluidPipeTileEntity;
 
 import java.util.List;
 import java.util.function.BiFunction;
@@ -41,7 +41,7 @@ public class PipeNetworkUtil {
             BlockPos pipePos = nodes.get(inputPipe.getNextNode(nodes, i));
             if (world.isBlockLoaded(pipePos)) {
                 FluidPipeTileEntity pipe = (FluidPipeTileEntity) network.getPipe(pipePos);
-                Pair<BlockPos, ItemStack> dest = pipe.getAvailableDestination(FluidItem.createItemFromFluid(fluid.copy()), false, preventOversending);
+                Pair<BlockPos, ItemStack> dest = pipe.getAvailableDestination(fluid.copy(), false, preventOversending);
                 if (dest != null && !dest.getLeft().equals(inputTankPos)) {
                     Function<Float, IPipeItem> sup = (speed) -> itemSupplier.apply(dest.getRight(), speed);
                     if (network.routeItemToLocation(inputPipePos, inputTankPos, pipe.getPos(), dest.getLeft(), dest.getRight(), sup)) {

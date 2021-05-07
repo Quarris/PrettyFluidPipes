@@ -1,4 +1,4 @@
-package quarris.ppfluids.items;
+package dev.quarris.ppfluids.items;
 
 import de.ellpeck.prettypipes.items.IModule;
 import de.ellpeck.prettypipes.items.ModuleItem;
@@ -9,9 +9,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
-import quarris.ppfluids.network.FluidPipeItem;
-import quarris.ppfluids.network.PipeNetworkUtil;
-import quarris.ppfluids.pipe.FluidPipeTileEntity;
+import dev.quarris.ppfluids.network.FluidPipeItem;
+import dev.quarris.ppfluids.network.PipeNetworkUtil;
+import dev.quarris.ppfluids.pipe.FluidPipeTileEntity;
 
 public class FluidExtractionModuleItem extends ModuleItem {
 
@@ -40,7 +40,6 @@ public class FluidExtractionModuleItem extends ModuleItem {
         //TODO FluidFilter
         //ItemFilter filter = new ItemFilter(this.filterSlots, module, tile);
 
-        PipeNetwork network = PipeNetwork.get(tile.getWorld());
         for (Direction dir : Direction.values()) {
             IFluidHandler tank = fluidPipe.getAdjacentFluidHandler(dir);
             if (tank == null)
