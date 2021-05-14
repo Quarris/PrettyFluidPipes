@@ -13,7 +13,7 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import org.apache.commons.lang3.tuple.Pair;
 import dev.quarris.ppfluids.ModContent;
 import dev.quarris.ppfluids.items.FluidItem;
-import dev.quarris.ppfluids.network.FluidPipeItem;
+import dev.quarris.ppfluids.pipenetwork.FluidPipeItem;
 
 import java.util.List;
 

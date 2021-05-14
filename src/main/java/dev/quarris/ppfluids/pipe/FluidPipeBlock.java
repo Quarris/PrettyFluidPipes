@@ -5,9 +5,13 @@ import de.ellpeck.prettypipes.pipe.ConnectionType;
 import de.ellpeck.prettypipes.pipe.IPipeConnectable;
 import de.ellpeck.prettypipes.pipe.PipeBlock;
 import net.minecraft.block.BlockState;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
@@ -17,6 +21,11 @@ public class FluidPipeBlock extends PipeBlock {
     @Override
     public TileEntity createNewTileEntity(IBlockReader worldIn) {
         return new FluidPipeTileEntity();
+    }
+
+    @Override
+    public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult result) {
+        return super.onBlockActivated(state, worldIn, pos, player, handIn, result);
     }
 
     @Override

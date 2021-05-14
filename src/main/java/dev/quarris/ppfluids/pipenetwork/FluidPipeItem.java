@@ -1,4 +1,4 @@
-package dev.quarris.ppfluids.network;
+package dev.quarris.ppfluids.pipenetwork;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;

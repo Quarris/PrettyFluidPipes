@@ -1,4 +1,4 @@
-package dev.quarris.ppfluids.network;
+package dev.quarris.ppfluids.pipenetwork;
 
 import de.ellpeck.prettypipes.network.PipeNetwork;
 import de.ellpeck.prettypipes.pipe.IPipeItem;
