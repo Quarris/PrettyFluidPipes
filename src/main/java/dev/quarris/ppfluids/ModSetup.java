@@ -3,6 +3,8 @@ package dev.quarris.ppfluids;
 import de.ellpeck.prettypipes.pipe.PipeRenderer;
 import dev.quarris.ppfluids.client.FluidExtractionModuleScreen;
 import dev.quarris.ppfluids.client.FluidFilterModuleScreen;
+import dev.quarris.ppfluids.client.FluidRetrievalModuleScreen;
+import dev.quarris.ppfluids.container.FluidRetrievalModuleContainer;
 import dev.quarris.ppfluids.network.PacketHandler;
 import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.client.renderer.RenderType;
@@ -31,6 +33,7 @@ public class ModSetup {
             ClientRegistry.bindTileEntityRenderer(ModContent.FLUID_PIPE_TILE, PipeRenderer::new);
             ScreenManager.registerFactory(ModContent.FLUID_FILTER_CONTAINER, FluidFilterModuleScreen::new);
             ScreenManager.registerFactory(ModContent.FLUID_EXTRACTION_CONTAINER, FluidExtractionModuleScreen::new);
+            ScreenManager.registerFactory(ModContent.FLUID_RETRIEVAL_CONTAINER, FluidRetrievalModuleScreen::new);
         }
     }
 }

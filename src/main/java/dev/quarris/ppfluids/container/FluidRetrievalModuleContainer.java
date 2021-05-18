@@ -1,7 +1,7 @@
 package dev.quarris.ppfluids.container;
 
 import de.ellpeck.prettypipes.pipe.containers.AbstractPipeContainer;
-import dev.quarris.ppfluids.items.FluidExtractionModuleItem;
+import dev.quarris.ppfluids.items.FluidRetrievalModuleItem;
 import dev.quarris.ppfluids.misc.FluidFilter;
 import dev.quarris.ppfluids.pipe.FluidPipeTileEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -14,11 +14,11 @@ import net.minecraft.util.math.BlockPos;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class FluidExtractionModuleContainer extends AbstractPipeContainer<FluidExtractionModuleItem> implements FluidFilter.IFluidFilteredContainer {
+public class FluidRetrievalModuleContainer extends AbstractPipeContainer<FluidRetrievalModuleItem> implements FluidFilter.IFluidFilteredContainer {
 
     private FluidFilter filter;
 
-    public FluidExtractionModuleContainer(@Nullable ContainerType<?> type, int id, PlayerEntity player, BlockPos pos, int moduleIndex) {
+    public FluidRetrievalModuleContainer(@Nullable ContainerType<?> type, int id, PlayerEntity player, BlockPos pos, int moduleIndex) {
         super(type, id, player, pos, moduleIndex);
     }
 

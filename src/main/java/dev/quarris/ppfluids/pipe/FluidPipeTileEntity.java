@@ -3,6 +3,8 @@ package dev.quarris.ppfluids.pipe;
 import de.ellpeck.prettypipes.network.PipeNetwork;
 import de.ellpeck.prettypipes.pipe.IPipeItem;
 import de.ellpeck.prettypipes.pipe.PipeTileEntity;
+import dev.quarris.ppfluids.items.IFluidFilterProvider;
+import dev.quarris.ppfluids.misc.FluidFilter;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
@@ -10,12 +12,14 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.items.IItemHandler;
 import org.apache.commons.lang3.tuple.Pair;
 import dev.quarris.ppfluids.ModContent;
 import dev.quarris.ppfluids.items.FluidItem;
 import dev.quarris.ppfluids.pipenetwork.FluidPipeItem;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class FluidPipeTileEntity extends PipeTileEntity {
 
@@ -28,7 +32,7 @@ public class FluidPipeTileEntity extends PipeTileEntity {
         if (!this.canWork()) {
             return null;
         }
-        if (!force && this.streamModules().anyMatch(m -> !(m.getRight()).canAcceptItem(m.getLeft(), this, FluidItem.createItemFromFluid(fluid)))) {
+        if (!force && this.streamModules().anyMatch(m -> !(m.getRight()).canAcceptItem(m.getLeft(), this, FluidItem.createItemFromFluid(fluid, false)))) {
             return null;
         }
 
@@ -67,7 +71,7 @@ public class FluidPipeTileEntity extends PipeTileEntity {
                     }
 
                     if (!toInsert.isEmpty()) {
-                        return Pair.of(tankPos, FluidItem.createItemFromFluid(toInsert));
+                        return Pair.of(tankPos, FluidItem.createItemFromFluid(toInsert, false));
                     }
                 }
             }
@@ -79,23 +83,6 @@ public class FluidPipeTileEntity extends PipeTileEntity {
     @Override
     public Pair<BlockPos, ItemStack> getAvailableDestination(ItemStack stack, boolean force, boolean preventOversending) {
         return null;
-    }
-
-    @Override
-    public List<IPipeItem> getItems() {
-        if (this.items == null) {
-            this.items = PipeNetwork.get(this.world).getItemsInPipe(this.pos);
-            /*
-            for (int i = 0, itemsSize = this.items.size(); i < itemsSize; i++) {
-                IPipeItem item = this.items.get(i);
-                if (item.getContent().getItem() == ModContent.FLUID_ITEM) {
-                    FluidPipeItem fluidItem = new FluidPipeItem(item.serializeNBT());
-                    this.items.set(i, fluidItem);
-                }
-            }
-             */
-        }
-        return this.items;
     }
 
     @Override
@@ -118,7 +105,21 @@ public class FluidPipeTileEntity extends PipeTileEntity {
         }
 
         return null;
-        //IPipeConnectable connectable = this.getPipeConnectable(dir);
-        //return connectable != null ? connectable.getItemHandler(this.world, this.pos, dir, item) : null;
+    }
+
+    @Override
+    public IItemHandler getItemHandler(Direction dir) {
+        IFluidHandler fluidHandler = this.getAdjacentFluidHandler(dir);
+        if (fluidHandler != null) {
+
+        }
+        return null;
+    }
+
+    public List<FluidFilter> getFluidFilters() {
+        return this.streamModules()
+                .filter(p -> p.getRight() instanceof IFluidFilterProvider)
+                .map(p -> ((IFluidFilterProvider) p.getRight()).getFluidFilter(p.getLeft(), this))
+                .collect(Collectors.toList());
     }
 }

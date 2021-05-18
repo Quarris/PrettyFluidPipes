@@ -40,7 +40,7 @@ public class FluidFilterModuleContainer extends AbstractPipeContainer<FluidFilte
 
     @Override
     public ItemStack slotClick(int slotId, int dragType, ClickType clickTypeIn, PlayerEntity player) {
-        return FluidFilterSlot.checkFilter(this, slotId, player) ? ItemStack.EMPTY : super.slotClick(slotId, dragType, clickTypeIn, player);
+        return FluidFilterSlot.isFilterSlot(this, slotId, player) ? ItemStack.EMPTY : super.slotClick(slotId, dragType, clickTypeIn, player);
     }
 
     @Override

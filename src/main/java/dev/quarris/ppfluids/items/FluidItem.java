@@ -38,21 +38,16 @@ public class FluidItem extends ItemFluidContainer {
                 .appendString(": ").appendString(String.valueOf(fluidStack.getAmount())));
     }
 
-    public static ItemStack createItemFromFluid(FluidStack fluid) {
+    public static ItemStack createItemFromFluid(FluidStack fluid, boolean simulate) {
         ItemStack item =  new ItemStack(ModContent.FLUID_ITEM);
-        IFluidHandlerItem tank = FluidUtil.getFluidHandler(item).orElse(null);
-        if (tank != null) {
-            tank.fill(fluid, IFluidHandler.FluidAction.EXECUTE);
-        }
+        int filled = FluidUtil.getFluidHandler(item).map(tank -> tank.fill(fluid, IFluidHandler.FluidAction.EXECUTE)).orElse(0);
+        if (!simulate)
+            fluid.grow(filled);
         return item;
     }
 
     public static FluidStack getFluidCopyFromItem(ItemStack item) {
-        IFluidHandlerItem handler = FluidUtil.getFluidHandler(item).orElse(null);
-        if (handler != null) {
-            return handler.getFluidInTank(0).copy();
-        }
-        return FluidStack.EMPTY;
+       return FluidUtil.getFluidHandler(item).map(handler -> handler.getFluidInTank(0).copy()).orElse(FluidStack.EMPTY);
     }
 
     public static ItemStack insertFluid(IFluidHandler handler, ItemStack fluidItem, boolean simulate) {
@@ -63,7 +58,7 @@ public class FluidItem extends ItemFluidContainer {
         if (fluidStack.isEmpty())
             return ItemStack.EMPTY;
 
-        return FluidItem.createItemFromFluid(fluidStack);
+        return FluidItem.createItemFromFluid(fluidStack, false);
     }
 
     @Override

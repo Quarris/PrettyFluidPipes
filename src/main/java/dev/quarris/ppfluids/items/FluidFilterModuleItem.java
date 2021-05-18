@@ -13,7 +13,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 
-public class FluidFilterModuleItem extends ModuleItem {
+public class FluidFilterModuleItem extends ModuleItem implements IFluidFilterProvider {
 
     public final int filterSlots;
     private final boolean canPopulateFromTanks;

@@ -20,7 +20,7 @@ public class FluidFilterSlot extends SlotItemHandler {
         this.filter = filter;
     }
 
-    public static boolean checkFilter(Container container, int slotId, PlayerEntity player) {
+    public static boolean isFilterSlot(Container container, int slotId, PlayerEntity player) {
         if (slotId >= 0 && slotId < container.inventorySlots.size()) {
             Slot slot = container.getSlot(slotId);
             if (slot instanceof FluidFilterSlot) {

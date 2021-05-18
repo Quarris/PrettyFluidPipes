@@ -10,7 +10,9 @@ import de.ellpeck.prettypipes.pipe.PipeTileEntity;
 import de.ellpeck.prettypipes.pipe.containers.AbstractPipeContainer;
 import dev.quarris.ppfluids.container.FluidExtractionModuleContainer;
 import dev.quarris.ppfluids.container.FluidFilterModuleContainer;
+import dev.quarris.ppfluids.container.FluidRetrievalModuleContainer;
 import dev.quarris.ppfluids.items.FluidFilterModuleItem;
+import dev.quarris.ppfluids.items.FluidRetrievalModuleItem;
 import net.minecraft.block.Block;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.item.BlockItem;
@@ -48,6 +50,8 @@ public class ModContent {
     public static ContainerType<FluidFilterModuleContainer> FLUID_FILTER_CONTAINER;
     @ObjectHolder(PPFluids.ID+":fluid_extraction")
     public static ContainerType<FluidExtractionModuleContainer> FLUID_EXTRACTION_CONTAINER;
+    @ObjectHolder(PPFluids.ID+":fluid_retrieval")
+    public static ContainerType<FluidRetrievalModuleContainer> FLUID_RETRIEVAL_CONTAINER;
 
     @SubscribeEvent
     public static void registerBlocks(RegistryEvent.Register<Block> event) {
@@ -65,6 +69,7 @@ public class ModContent {
 
         event.getRegistry().registerAll(createTieredModule("fluid_extraction_module", FluidExtractionModuleItem::new));
         event.getRegistry().registerAll(createTieredModule("fluid_filter_module", FluidFilterModuleItem::new));
+        event.getRegistry().registerAll(createTieredModule("fluid_retrieval_module", FluidRetrievalModuleItem::new));
         IPipeItem.TYPES.put(FluidPipeItem.TYPE, FluidPipeItem::new);
     }
 
@@ -79,7 +84,8 @@ public class ModContent {
     public static void registerContainers(RegistryEvent.Register<ContainerType<?>> event) {
         event.getRegistry().registerAll(
                 createPipeContainer(PPFluids.createRes("fluid_filter")),
-                createPipeContainer(PPFluids.createRes("fluid_extraction"))
+                createPipeContainer(PPFluids.createRes("fluid_extraction")),
+                createPipeContainer(PPFluids.createRes("fluid_retrieval"))
         );
     }
 

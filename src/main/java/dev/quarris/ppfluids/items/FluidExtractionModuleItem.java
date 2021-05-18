@@ -18,7 +18,7 @@ import net.minecraft.util.Direction;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 
-public class FluidExtractionModuleItem extends ModuleItem {
+public class FluidExtractionModuleItem extends ModuleItem implements IFluidFilterProvider {
 
     private final int maxExtraction;
     private final int speed;
