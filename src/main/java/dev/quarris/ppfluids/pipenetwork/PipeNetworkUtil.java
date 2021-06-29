@@ -1,9 +1,12 @@
 package dev.quarris.ppfluids.pipenetwork;
 
 import de.ellpeck.prettypipes.misc.ItemEquality;
+import de.ellpeck.prettypipes.network.NetworkEdge;
 import de.ellpeck.prettypipes.network.NetworkLocation;
 import de.ellpeck.prettypipes.network.NetworkLock;
 import de.ellpeck.prettypipes.network.PipeNetwork;
+import de.ellpeck.prettypipes.packets.PacketHandler;
+import de.ellpeck.prettypipes.packets.PacketItemEnterPipe;
 import de.ellpeck.prettypipes.pipe.IPipeItem;
 import de.ellpeck.prettypipes.pipe.PipeTileEntity;
 import net.minecraft.item.ItemStack;
@@ -17,6 +20,7 @@ import net.minecraftforge.items.IItemHandler;
 import org.apache.commons.lang3.tuple.Pair;
 import dev.quarris.ppfluids.items.FluidItem;
 import dev.quarris.ppfluids.pipe.FluidPipeTileEntity;
+import org.jgrapht.GraphPath;
 
 import java.util.ArrayList;
 import java.util.Collections;
