@@ -30,7 +30,7 @@ public class FluidExtractionModuleItem extends ModuleItem implements IFluidFilte
         this.maxExtraction = tier.forTier(500, 2000, 8000);
         this.speed = tier.forTier(20, 15, 10);
         this.filterSlots = tier.forTier(2, 4, 8);
-        this.preventOversending = tier.forTier(false, false, true);
+        this.preventOversending = tier.forTier(true, true, true);
     }
 
     @Override
@@ -67,8 +67,8 @@ public class FluidExtractionModuleItem extends ModuleItem implements IFluidFilte
     }
 
     @Override
-    public boolean isCompatible(ItemStack itemStack, PipeTileEntity pipeTileEntity, IModule iModule) {
-        return !(iModule instanceof FluidExtractionModuleItem);
+    public boolean isCompatible(ItemStack itemStack, PipeTileEntity tile, IModule iModule) {
+        return tile instanceof FluidPipeTileEntity && !(iModule instanceof FluidExtractionModuleItem);
     }
 
     public boolean canNetworkSee(ItemStack module, PipeTileEntity tile) {

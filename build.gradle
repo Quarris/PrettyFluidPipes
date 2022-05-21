@@ -13,7 +13,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '0.4.1'
+version = '1.16.5-0.4.2'
 group = 'dev.quarris.ppfluids' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'PrettyPipesFluids'
 
@@ -89,15 +89,16 @@ repositories {
     maven {
         url = "https://maven.ellpeck.de"
     }
-
-    flatDir { dirs 'libs' }
+    maven {
+        url "https://cursemaven.com"
+    }
 }
 
 dependencies {
     minecraft 'net.minecraftforge:forge:1.16.5-36.0.43'
-    compile fg.deobf('de.ellpeck.prettypipes:PrettyPipes:1.9.3.28')
-    runtimeOnly fg.deobf('not_used:VoidTanks-1.16.4:1.2')
-    runtimeOnly fg.deobf('not_used:jei-1.16.5:7.6.4.90')
+    compile fg.deobf('curse.maven:PrettyPipes-376737:3724799')
+    runtimeOnly fg.deobf('curse.maven:VoidTanks-404883:3314304')
+    runtimeOnly fg.deobf('curse.maven:Jei-238222:3681294')
 
 }
 

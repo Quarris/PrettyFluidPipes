@@ -1,17 +1,11 @@
 package dev.quarris.ppfluids.items;
 
-import de.ellpeck.prettypipes.Registry;
 import de.ellpeck.prettypipes.items.IModule;
 import de.ellpeck.prettypipes.items.ModuleItem;
 import de.ellpeck.prettypipes.items.ModuleTier;
-import de.ellpeck.prettypipes.misc.ItemEquality;
-import de.ellpeck.prettypipes.misc.ItemFilter;
 import de.ellpeck.prettypipes.network.PipeNetwork;
 import de.ellpeck.prettypipes.pipe.PipeTileEntity;
 import de.ellpeck.prettypipes.pipe.containers.AbstractPipeContainer;
-import java.util.Iterator;
-
-import de.ellpeck.prettypipes.pipe.modules.retrieval.RetrievalModuleContainer;
 import dev.quarris.ppfluids.ModContent;
 import dev.quarris.ppfluids.container.FluidRetrievalModuleContainer;
 import dev.quarris.ppfluids.misc.FluidFilter;
@@ -35,7 +29,7 @@ public class FluidRetrievalModuleItem extends ModuleItem implements IFluidFilter
         this.maxExtraction = tier.forTier(1, 8, 16);
         this.speed = tier.forTier(40, 20, 10);
         this.filterSlots = tier.forTier(3, 6, 9);
-        this.preventOversending = tier.forTier(false, true, true);
+        this.preventOversending = tier.forTier(true, true, true);
     }
 
     public void tick(ItemStack module, PipeTileEntity tile) {
@@ -74,7 +68,7 @@ public class FluidRetrievalModuleItem extends ModuleItem implements IFluidFilter
     }
 
     public boolean isCompatible(ItemStack module, PipeTileEntity tile, IModule other) {
-        return !(other instanceof FluidRetrievalModuleItem);
+        return tile instanceof FluidPipeTileEntity && !(other instanceof FluidRetrievalModuleItem);
     }
 
     public boolean hasContainer(ItemStack module, PipeTileEntity tile) {

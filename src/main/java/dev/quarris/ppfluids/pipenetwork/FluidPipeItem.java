@@ -7,6 +7,7 @@ import de.ellpeck.prettypipes.network.PipeItem;
 import de.ellpeck.prettypipes.network.PipeNetwork;
 import de.ellpeck.prettypipes.pipe.IPipeConnectable;
 import de.ellpeck.prettypipes.pipe.PipeTileEntity;
+import dev.quarris.ppfluids.ModConfig;
 import dev.quarris.ppfluids.client.FluidBlobRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
@@ -59,13 +60,16 @@ public class FluidPipeItem extends PipeItem {
 
     @Override
     public void drop(World world, ItemStack stack) {
-        super.drop(world, stack);
+        if (ModConfig.dropFluidContainers.get()) {
+            super.drop(world, stack);
+        }
     }
 
     @Override
     protected void onPathObstructed(PipeTileEntity currPipe, boolean tryReturn) {
         if (currPipe.getWorld().isRemote)
             return;
+
         PipeNetwork network = PipeNetwork.get(currPipe.getWorld());
         if (tryReturn) {
             // first time: we try to return to our input chest

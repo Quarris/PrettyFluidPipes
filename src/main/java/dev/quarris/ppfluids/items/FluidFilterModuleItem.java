@@ -25,12 +25,13 @@ public class FluidFilterModuleItem extends ModuleItem implements IFluidFilterPro
     }
 
     public boolean canAcceptItem(ItemStack module, PipeTileEntity tile, ItemStack stack) {
+        if (!(tile instanceof FluidPipeTileEntity)) return super.canAcceptItem(module, tile, stack);
         FluidFilter filter = this.getFluidFilter(module, (FluidPipeTileEntity)tile);
         return filter.isAllowed(stack);
     }
 
     public boolean isCompatible(ItemStack module, PipeTileEntity tile, IModule other) {
-        return !(other instanceof FluidFilterModuleItem);
+        return tile instanceof FluidPipeTileEntity && !(other instanceof FluidFilterModuleItem);
     }
 
     public boolean hasContainer(ItemStack module, PipeTileEntity tile) {

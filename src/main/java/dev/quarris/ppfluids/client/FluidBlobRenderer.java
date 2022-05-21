@@ -37,9 +37,11 @@ public class FluidBlobRenderer {
 
         IVertexBuilder vbuf = sprite.wrapBuffer(buffer.getBuffer(RenderType.getEntityTranslucent(sprite.getAtlasTexture().getTextureLocation())));
 
+        matrixStack.push();
         matrixStack.translate(item.x, item.y, item.z);
         matrixStack.scale(size, size, size);
         MODEL.render(matrixStack, vbuf, light, overlay, r, g, b, a);
+        matrixStack.pop();
     }
 
     private static TextureAtlasSprite getFluidStillSprite(Fluid fluid) {
