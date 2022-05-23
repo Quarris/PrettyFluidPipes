@@ -3,10 +3,10 @@ package dev.quarris.ppfluids.network;
 import dev.quarris.ppfluids.misc.FluidFilter;
 import dev.quarris.ppfluids.misc.FluidFilter.IFluidFilteredContainer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.network.NetworkEvent;
 import org.apache.logging.log4j.util.TriConsumer;
 
 import java.util.function.Supplier;
@@ -25,7 +25,7 @@ public class ButtonPacket {
     private ButtonPacket() {
     }
 
-    public static ButtonPacket decode(PacketBuffer buf) {
+    public static ButtonPacket decode(FriendlyByteBuf buf) {
         ButtonPacket packet = new ButtonPacket();
         packet.pos = buf.readBlockPos();
         packet.result = ButtonResult.values()[buf.readByte()];
@@ -33,7 +33,7 @@ public class ButtonPacket {
         return packet;
     }
 
-    public static void encode(ButtonPacket packet, PacketBuffer buf) {
+    public static void encode(ButtonPacket packet, FriendlyByteBuf buf) {
         buf.writeBlockPos(packet.pos);
         buf.writeByte(packet.result.ordinal());
         buf.writeVarIntArray(packet.data);
@@ -41,7 +41,7 @@ public class ButtonPacket {
 
     public static void handle(final ButtonPacket message, final Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
-            PlayerEntity player = ctx.get().getSender();
+            Player player = ctx.get().getSender();
             message.result.action.accept(message.pos, message.data, player);
         });
         ctx.get().setPacketHandled(true);
@@ -52,16 +52,16 @@ public class ButtonPacket {
         result.action.accept(pos, data, Minecraft.getInstance().player);
     }
 
-    public static enum ButtonResult {
+    public enum ButtonResult {
         FILTER_CHANGE((pos, data, player) -> {
-            IFluidFilteredContainer container = (IFluidFilteredContainer)player.openContainer;
+            IFluidFilteredContainer container = (IFluidFilteredContainer)player.containerMenu;
             FluidFilter filter = container.getFilter();
             filter.onButtonPacket(data[0]);
         });
 
-        public final TriConsumer<BlockPos, int[], PlayerEntity> action;
+        public final TriConsumer<BlockPos, int[], Player> action;
 
-        ButtonResult(TriConsumer<BlockPos, int[], PlayerEntity> action) {
+        ButtonResult(TriConsumer<BlockPos, int[], Player> action) {
             this.action = action;
         }
     }

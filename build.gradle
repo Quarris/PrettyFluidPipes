@@ -1,11 +1,11 @@
 buildscript {
     repositories {
-        maven { url = 'https://files.minecraftforge.net/maven' }
+        maven { url = 'https://maven.minecraftforge.net' }
         jcenter()
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
     }
 }
 apply plugin: 'net.minecraftforge.gradle'
@@ -13,11 +13,11 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '1.16.5-0.4.2'
+version = "${mc_version}-${mod_version}"
 group = 'dev.quarris.ppfluids' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'PrettyPipesFluids'
 
-sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 minecraft {
     // The mappings can be changed at any time, and must be in the following format.
@@ -25,10 +25,10 @@ minecraft {
     // stable_#            Stables are built at the discretion of the MCP team.
     // Use non-default mappings at your own risk. they may not always work.
     // Simply re-run your setup task after changing the mappings to update your workspace.
-    mappings channel: 'snapshot', version: '20201028-1.16.3'
+    mappings channel: "${mappings_channel}", version: "${mappings_version}"
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
     
-    // accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
     // Default run configurations.
     // These can be tweaked, removed, or duplicated as needed.
@@ -92,13 +92,23 @@ repositories {
     maven {
         url "https://cursemaven.com"
     }
+    maven {
+        name = "Progwml6 maven"
+        url = "https://dvs1.progwml6.com/files/maven/"
+    }
+    maven {
+        name = "ModMaven"
+        url = "https://modmaven.dev"
+    }
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.16.5-36.0.43'
-    compile fg.deobf('curse.maven:PrettyPipes-376737:3724799')
-    runtimeOnly fg.deobf('curse.maven:VoidTanks-404883:3314304')
-    runtimeOnly fg.deobf('curse.maven:Jei-238222:3681294')
+    minecraft "net.minecraftforge:forge:${mc_version}-${forge_version}"
+    //implementation fg.deobf("de.ellpeck.prettypipes:PrettyPipes:${pp_version}")
+    runtimeOnly fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}")
+    runtimeOnly fg.deobf('curse.maven:ITank-256991:3697465')
+    implementation fg.deobf('curse.maven:PrettyPipes-376737:3798343')
+    //runtimeOnly fg.deobf('curse.maven:Jei-238222:3681294')
 
 }
 

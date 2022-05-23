@@ -1,10 +1,10 @@
 package dev.quarris.ppfluids.container;
 
 import dev.quarris.ppfluids.misc.FluidFilter;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.items.SlotItemHandler;
@@ -20,11 +20,11 @@ public class FluidFilterSlot extends SlotItemHandler {
         this.filter = filter;
     }
 
-    public static boolean isFilterSlot(Container container, int slotId, PlayerEntity player) {
-        if (slotId >= 0 && slotId < container.inventorySlots.size()) {
+    public static boolean isFilterSlot(AbstractContainerMenu container, int slotId, Player player) {
+        if (slotId >= 0 && slotId < container.slots.size()) {
             Slot slot = container.getSlot(slotId);
             if (slot instanceof FluidFilterSlot) {
-                ((FluidFilterSlot)slot).slotClick(player);
+                ((FluidFilterSlot)slot).slotClick(container);
                 return true;
             }
         }
@@ -32,9 +32,9 @@ public class FluidFilterSlot extends SlotItemHandler {
         return false;
     }
 
-    private void slotClick(PlayerEntity player) {
-        ItemStack heldStack = player.inventory.getItemStack();
-        ItemStack stackInSlot = this.getStack();
+    private void slotClick(AbstractContainerMenu menu) {
+        ItemStack heldStack = menu.getCarried();
+        ItemStack stackInSlot = this.getItem();
         if (!stackInSlot.isEmpty() && heldStack.isEmpty()) {
             this.putFluidStack(FluidStack.EMPTY);
         } else if (!heldStack.isEmpty()) {
@@ -48,21 +48,22 @@ public class FluidFilterSlot extends SlotItemHandler {
 
     public void putFluidStack(FluidStack stack) {
         this.filter.setFilter(this.index, stack);
-        this.onSlotChanged();
+        this.setChanged();
     }
 
     @Override
-    public void onSlotChanged() {
+    public void setChanged() {
         this.filter.setModified(true);
     }
 
     @Override
-    public boolean isItemValid(ItemStack stack) {
+    public boolean mayPlace(ItemStack stack) {
         return false;
     }
 
+
     @Override
-    public boolean canTakeStack(PlayerEntity playerIn) {
+    public boolean mayPickup(Player playerIn) {
         return false;
     }
 }
