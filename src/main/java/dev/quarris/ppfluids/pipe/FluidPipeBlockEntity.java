@@ -1,34 +1,34 @@
 package dev.quarris.ppfluids.pipe;
 
 import de.ellpeck.prettypipes.network.PipeNetwork;
-import de.ellpeck.prettypipes.pipe.IPipeItem;
-import de.ellpeck.prettypipes.pipe.PipeTileEntity;
+import de.ellpeck.prettypipes.pipe.PipeBlockEntity;
+import dev.quarris.ppfluids.ModContent;
+import dev.quarris.ppfluids.items.FluidItem;
 import dev.quarris.ppfluids.items.IFluidFilterProvider;
 import dev.quarris.ppfluids.misc.FluidFilter;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
+import dev.quarris.ppfluids.pipenetwork.FluidPipeItem;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.IItemHandler;
 import org.apache.commons.lang3.tuple.Pair;
-import dev.quarris.ppfluids.ModContent;
-import dev.quarris.ppfluids.items.FluidItem;
-import dev.quarris.ppfluids.pipenetwork.FluidPipeItem;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class FluidPipeTileEntity extends PipeTileEntity {
+public class FluidPipeBlockEntity extends PipeBlockEntity {
 
-    public FluidPipeTileEntity() {
-        super(ModContent.FLUID_PIPE_TILE);
+    public FluidPipeBlockEntity(BlockPos pos, BlockState state) {
+        super(pos, state);
+        this.type = ModContent.FLUID_PIPE_TILE.get();
     }
 
     public Pair<BlockPos, ItemStack> getAvailableDestination(FluidStack fluid, boolean force, boolean preventOversending) {
-
         if (!this.canWork()) {
             return null;
         }
@@ -50,13 +50,13 @@ public class FluidPipeTileEntity extends PipeTileEntity {
                         toInsert.setAmount(maxAmount);
                     }
 
-                    BlockPos tankPos = this.pos.offset(dir);
+                    BlockPos tankPos = this.getBlockPos().relative(dir);
                     if (preventOversending || maxAmount < Integer.MAX_VALUE) {
-                        PipeNetwork network = PipeNetwork.get(this.world);
+                        PipeNetwork network = PipeNetwork.get(this.level);
                         int onTheWay = network.getPipeItemsOnTheWay(tankPos)
                                 .filter(item -> item instanceof FluidPipeItem)
                                 .map(item -> (FluidPipeItem) item)
-                                .filter(item -> toInsert.getFluid().isEquivalentTo(item.getFluidContent().getFluid()))
+                                .filter(item -> toInsert.getFluid().isSame(item.getFluidContent().getFluid()))
                                 .mapToInt(item -> item.getFluidContent().getAmount())
                                 .sum();
 
@@ -95,8 +95,8 @@ public class FluidPipeTileEntity extends PipeTileEntity {
             return null;
         }
 
-        BlockPos pos = this.pos.offset(dir);
-        TileEntity tile = this.world.getTileEntity(pos);
+        BlockPos pos = this.getBlockPos().relative(dir);
+        BlockEntity tile = this.level.getBlockEntity(pos);
         if (tile != null) {
             IFluidHandler handler = tile.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, dir.getOpposite()).orElse(null);
             if (handler != null) {

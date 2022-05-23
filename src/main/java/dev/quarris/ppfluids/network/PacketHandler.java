@@ -1,18 +1,18 @@
 package dev.quarris.ppfluids.network;
 
-import dev.quarris.ppfluids.PPFluids;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.network.NetworkRegistry;
-import net.minecraftforge.fml.network.PacketDistributor;
-import net.minecraftforge.fml.network.simple.SimpleChannel;
+import dev.quarris.ppfluids.ModRef;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraftforge.network.NetworkRegistry;
+import net.minecraftforge.network.PacketDistributor;
+import net.minecraftforge.network.simple.SimpleChannel;
 
 public final class PacketHandler {
     private static final String VERSION = "1";
     private static SimpleChannel channel = NetworkRegistry.newSimpleChannel(
-            PPFluids.createRes("channel"),
+            ModRef.res("channel"),
             () -> VERSION,
             VERSION::equals,
             VERSION::equals
@@ -22,12 +22,12 @@ public final class PacketHandler {
         channel.registerMessage(0, ButtonPacket.class, ButtonPacket::encode, ButtonPacket::decode, ButtonPacket::handle);
     }
 
-    public static void sendToAllLoaded(World world, BlockPos pos, Object message) {
-        channel.send(PacketDistributor.TRACKING_CHUNK.with(() -> world.getChunkAt(pos)), message);
+    public static void sendToAllLoaded(Level level, BlockPos pos, Object message) {
+        channel.send(PacketDistributor.TRACKING_CHUNK.with(() -> level.getChunkAt(pos)), message);
     }
 
-    public static void sendTo(PlayerEntity player, Object message) {
-        channel.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) player), message);
+    public static void sendTo(Player player, Object message) {
+        channel.send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) player), message);
     }
 
     public static void sendToServer(Object message) {

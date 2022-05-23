@@ -1,24 +1,24 @@
 package dev.quarris.ppfluids.misc;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import dev.quarris.ppfluids.ModContent;
 import dev.quarris.ppfluids.container.FluidFilterSlot;
 import dev.quarris.ppfluids.network.ButtonPacket;
-import dev.quarris.ppfluids.pipe.FluidPipeTileEntity;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.Widget;
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.util.Direction;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import dev.quarris.ppfluids.pipe.FluidPipeBlockEntity;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Widget;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.core.Direction;
+import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
@@ -29,8 +29,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
-public class FluidFilter extends ItemStackHandler implements INBTSerializable<CompoundNBT> {
-    protected FluidPipeTileEntity pipe;
+public class FluidFilter extends ItemStackHandler implements INBTSerializable<CompoundTag> {
+    protected FluidPipeBlockEntity pipe;
     protected ItemStack moduleItem;
     protected NonNullList<FluidStack> filters;
     public boolean canPopulateFromTanks;
@@ -38,7 +38,7 @@ public class FluidFilter extends ItemStackHandler implements INBTSerializable<Co
     public boolean canModifyWhitelist = true;
     private boolean modified;
 
-    public FluidFilter(int size, ItemStack moduleItem, FluidPipeTileEntity pipe) {
+    public FluidFilter(int size, ItemStack moduleItem, FluidPipeBlockEntity pipe) {
         super(size);
         this.filters = NonNullList.withSize(size, FluidStack.EMPTY);
         this.pipe = pipe;
@@ -49,7 +49,7 @@ public class FluidFilter extends ItemStackHandler implements INBTSerializable<Co
     }
 
     public boolean isAllowed(ItemStack stack) {
-        if (stack.getItem() == ModContent.FLUID_ITEM) {
+        if (stack.getItem() == ModContent.FLUID_ITEM.get()) {
             return FluidUtil.getFluidContained(stack).map(this::isAllowed).orElse(false);
         }
         return false;
@@ -89,22 +89,22 @@ public class FluidFilter extends ItemStackHandler implements INBTSerializable<Co
     }
 
     @OnlyIn(Dist.CLIENT)
-    public List<Widget> createScreenButtons(final Screen gui, int x, int y) {
-        List<Widget> buttons = new ArrayList<>();
+    public List<AbstractWidget> createScreenButtons(final Screen gui, int x, int y) {
+        List<AbstractWidget> buttons = new ArrayList<>();
         if (this.canModifyWhitelist) {  // Allowed/Disallowed button
-            Supplier<TranslationTextComponent> whitelistText = () -> new TranslationTextComponent("info.prettypipes." + (this.isWhitelist ? "whitelist" : "blacklist"));
+            Supplier<TranslatableComponent> whitelistText = () -> new TranslatableComponent("info.prettypipes." + (this.isWhitelist ? "whitelist" : "blacklist"));
             buttons.add(new Button(x, y, 70, 20, whitelistText.get(), (button) -> {
-                ButtonPacket.sendAndExecute(this.pipe.getPos(), ButtonPacket.ButtonResult.FILTER_CHANGE, 0);
+                ButtonPacket.sendAndExecute(this.pipe.getBlockPos(), ButtonPacket.ButtonResult.FILTER_CHANGE, 0);
                 button.setMessage(whitelistText.get());
             }));
         }
 
         if (this.canPopulateFromTanks) { // Populate button
-            buttons.add(new Button(x + 72, y, 70, 20, new TranslationTextComponent("info.prettypipes.populate"), (button) -> {
-                ButtonPacket.sendAndExecute(this.pipe.getPos(), ButtonPacket.ButtonResult.FILTER_CHANGE, 1);
+            buttons.add(new Button(x + 72, y, 70, 20, new TranslatableComponent("info.prettypipes.populate"), (button) -> {
+                ButtonPacket.sendAndExecute(this.pipe.getBlockPos(), ButtonPacket.ButtonResult.FILTER_CHANGE, 1);
             }) {
-                public void renderToolTip(MatrixStack matrix, int x, int y) {
-                    gui.renderTooltip(matrix, (new TranslationTextComponent("info.prettypipes.populate.description")).mergeStyle(TextFormatting.GRAY), x, y);
+                public void renderToolTip(PoseStack matrix, int x, int y) {
+                    gui.renderTooltip(matrix, (new TranslatableComponent("info.prettypipes.populate.description")).withStyle(ChatFormatting.GRAY), x, y);
                 }
             });
         }
@@ -151,11 +151,11 @@ public class FluidFilter extends ItemStackHandler implements INBTSerializable<Co
     }
 
     @Override
-    public CompoundNBT serializeNBT() {
-        CompoundNBT nbt = new CompoundNBT();
-        ListNBT fluidList = new ListNBT();
+    public CompoundTag serializeNBT() {
+        CompoundTag nbt = new CompoundTag();
+        ListTag fluidList = new ListTag();
         for (FluidStack fluid : this.filters) {
-            fluidList.add(fluid.writeToNBT(new CompoundNBT()));
+            fluidList.add(fluid.writeToNBT(new CompoundTag()));
         }
         nbt.put("fluids", fluidList);
         if (this.canModifyWhitelist) {
@@ -166,10 +166,10 @@ public class FluidFilter extends ItemStackHandler implements INBTSerializable<Co
     }
 
     @Override
-    public void deserializeNBT(CompoundNBT nbt) {
-        ListNBT fluidList = nbt.getList("fluids", Constants.NBT.TAG_COMPOUND);
+    public void deserializeNBT(CompoundTag nbt) {
+        ListTag fluidList = nbt.getList("fluids", CompoundTag.TAG_COMPOUND);
         for (int i = 0; i < fluidList.size(); i++) {
-            CompoundNBT fluidNBT = fluidList.getCompound(i);
+            CompoundTag fluidNBT = fluidList.getCompound(i);
             FluidStack fluid = FluidStack.loadFluidStackFromNBT(fluidNBT);
             this.filters.set(i, fluid);
             this.setStackInSlot(i, FluidUtil.getFilledBucket(fluid));

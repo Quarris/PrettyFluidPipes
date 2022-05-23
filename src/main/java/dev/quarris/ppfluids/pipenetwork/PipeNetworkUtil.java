@@ -1,26 +1,18 @@
 package dev.quarris.ppfluids.pipenetwork;
 
-import de.ellpeck.prettypipes.misc.ItemEquality;
-import de.ellpeck.prettypipes.network.NetworkEdge;
-import de.ellpeck.prettypipes.network.NetworkLocation;
 import de.ellpeck.prettypipes.network.NetworkLock;
 import de.ellpeck.prettypipes.network.PipeNetwork;
-import de.ellpeck.prettypipes.packets.PacketHandler;
-import de.ellpeck.prettypipes.packets.PacketItemEnterPipe;
 import de.ellpeck.prettypipes.pipe.IPipeItem;
-import de.ellpeck.prettypipes.pipe.PipeTileEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.items.IItemHandler;
-import org.apache.commons.lang3.tuple.Pair;
+import de.ellpeck.prettypipes.pipe.PipeBlockEntity;
 import dev.quarris.ppfluids.items.FluidItem;
-import dev.quarris.ppfluids.pipe.FluidPipeTileEntity;
-import org.jgrapht.GraphPath;
+import dev.quarris.ppfluids.pipe.FluidPipeBlockEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.IFluidHandler;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,33 +23,33 @@ import java.util.stream.Collectors;
 
 public class PipeNetworkUtil {
 
-    public static FluidStack routeFluid(World world, BlockPos inputPipePos, BlockPos inputTankPos, FluidStack fluid, BiFunction<ItemStack, Float, FluidPipeItem> itemSupplier, boolean preventOversending) {
-        PipeNetwork network = PipeNetwork.get(world);
+    public static FluidStack routeFluid(Level level, BlockPos inputPipePos, BlockPos inputTankPos, FluidStack fluid, BiFunction<ItemStack, Float, FluidPipeItem> itemSupplier, boolean preventOversending) {
+        PipeNetwork network = PipeNetwork.get(level);
         if (!network.isNode(inputPipePos)) {
             return fluid;
         }
-        if (!world.isBlockLoaded(inputPipePos)) {
+        if (!level.isLoaded(inputPipePos)) {
             return fluid;
         }
 
-        PipeTileEntity inputPipe = network.getPipe(inputPipePos);
+        PipeBlockEntity inputPipe = network.getPipe(inputPipePos);
         if (inputPipe == null)
             return fluid;
 
         network.startProfile("find_fluid_destination");
         List<BlockPos> nodes = network.getOrderedNetworkNodes(inputPipePos).stream()
-                .filter(world::isBlockLoaded)
-                .filter(pos -> world.getTileEntity(pos) instanceof FluidPipeTileEntity)
+                .filter(level::isLoaded)
+                .filter(pos -> level.getBlockEntity(pos) instanceof FluidPipeBlockEntity)
                 .collect(Collectors.toList());
 
         for (int i = 0; i < nodes.size(); ++i) {
             BlockPos pipePos = nodes.get(inputPipe.getNextNode(nodes, i));
-            if (world.isBlockLoaded(pipePos)) {
-                FluidPipeTileEntity pipe = (FluidPipeTileEntity) network.getPipe(pipePos);
+            if (level.isLoaded(pipePos)) {
+                FluidPipeBlockEntity pipe = (FluidPipeBlockEntity) network.getPipe(pipePos);
                 Pair<BlockPos, ItemStack> dest = pipe.getAvailableDestination(fluid.copy(), false, preventOversending);
                 if (dest != null && !dest.getLeft().equals(inputTankPos)) {
                     Function<Float, IPipeItem> sup = (speed) -> itemSupplier.apply(dest.getRight(), speed);
-                    if (network.routeItemToLocation(inputPipePos, inputTankPos, pipe.getPos(), dest.getLeft(), dest.getRight(), sup)) {
+                    if (network.routeItemToLocation(inputPipePos, inputTankPos, pipe.getBlockPos(), dest.getLeft(), dest.getRight(), sup)) {
                         FluidStack remain = fluid.copy();
                         FluidStack routedFluid = FluidItem.getFluidCopyFromItem(dest.getRight());
                         remain.shrink(routedFluid.getAmount());
@@ -72,12 +64,12 @@ public class PipeNetworkUtil {
         return fluid;
     }
 
-    public static FluidStack requestFluid(World world, BlockPos destPipe, BlockPos destInventory, FluidStack fluid) {
-        PipeNetwork network = PipeNetwork.get(world);
+    public static FluidStack requestFluid(Level level, BlockPos destPipe, BlockPos destInventory, FluidStack fluid) {
+        PipeNetwork network = PipeNetwork.get(level);
         FluidStack remain = fluid.copy();
         // check existing items
-        for (FluidNetworkLocation location : getOrderedNetworkFluids(world, destPipe)) {
-            remain = requestExistingFluid(world, location, destPipe, destInventory, null, remain);
+        for (FluidNetworkLocation location : getOrderedNetworkFluids(level, destPipe)) {
+            remain = requestExistingFluid(level, location, destPipe, destInventory, null, remain);
             if (remain.isEmpty())
                 return remain;
         }
@@ -85,12 +77,12 @@ public class PipeNetworkUtil {
         return FluidStack.EMPTY;
     }
 
-    public static FluidStack requestExistingFluid(World world, FluidNetworkLocation location, BlockPos destPipe, BlockPos destInventory, NetworkLock ignoredLock, FluidStack fluid) {
-        PipeNetwork network = PipeNetwork.get(world);
+    public static FluidStack requestExistingFluid(Level level, FluidNetworkLocation location, BlockPos destPipe, BlockPos destInventory, NetworkLock ignoredLock, FluidStack fluid) {
+        PipeNetwork network = PipeNetwork.get(level);
         if (location.getPos().equals(destInventory))
             return fluid;
         // make sure we don't pull any locked items
-        int amount = location.getFluidAmount(world, fluid);
+        int amount = location.getFluidAmount(level, fluid);
         if (amount <= 0)
             return fluid;
         FluidStack remain = fluid.copy();
@@ -98,9 +90,9 @@ public class PipeNetworkUtil {
         if (remain.getAmount() < amount)
             amount = remain.getAmount();
         remain.shrink(amount);
-        for (int slot : location.getFluidSlots(world, fluid)) {
+        for (int slot : location.getFluidSlots(level, fluid)) {
             // try to extract from that location's inventory and send the item
-            IFluidHandler handler = location.getFluidHandler(world);
+            IFluidHandler handler = location.getFluidHandler(level);
             FluidStack stack = handler.getFluidInTank(slot).copy();
             FluidStack extracted = handler.drain(stack, IFluidHandler.FluidAction.SIMULATE);
             ItemStack fluidItem = FluidItem.createItemFromFluid(extracted, false);
@@ -114,32 +106,32 @@ public class PipeNetworkUtil {
         return remain;
     }
 
-    public static List<FluidNetworkLocation> getOrderedNetworkFluids(World world, BlockPos node) {
-        PipeNetwork network = PipeNetwork.get(world);
+    public static List<FluidNetworkLocation> getOrderedNetworkFluids(Level level, BlockPos node) {
+        PipeNetwork network = PipeNetwork.get(level);
         if (!network.isNode(node))
             return Collections.emptyList();
         network.startProfile("get_network_fluids");
         List<FluidNetworkLocation> info = new ArrayList<>();
         for (BlockPos dest : network.getOrderedNetworkNodes(node)) {
-            if (!world.isBlockLoaded(dest))
+            if (!level.isLoaded(dest))
                 continue;
-            PipeTileEntity pipe = network.getPipe(dest);
-            if (!(pipe instanceof FluidPipeTileEntity))
+            PipeBlockEntity pipe = network.getPipe(dest);
+            if (!(pipe instanceof FluidPipeBlockEntity))
                 continue;
 
             if (!pipe.canNetworkSee())
                 continue;
 
-            FluidPipeTileEntity fluidPipe = (FluidPipeTileEntity) pipe;
+            FluidPipeBlockEntity fluidPipe = (FluidPipeBlockEntity) pipe;
             for (Direction dir : Direction.values()) {
                 IFluidHandler handler = fluidPipe.getAdjacentFluidHandler(dir);
                 if (handler == null)
                     continue;
                 // check if this handler already exists (double-connected pipes, double chests etc.)
-                if (info.stream().anyMatch(l -> handler.equals(l.getFluidHandler(world))))
+                if (info.stream().anyMatch(l -> handler.equals(l.getFluidHandler(level))))
                     continue;
                 FluidNetworkLocation location = new FluidNetworkLocation(dest, dir);
-                if (!location.isEmpty(world))
+                if (!location.isEmpty(level))
                     info.add(location);
             }
         }

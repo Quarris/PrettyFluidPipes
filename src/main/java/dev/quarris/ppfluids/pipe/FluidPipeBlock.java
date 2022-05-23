@@ -4,40 +4,40 @@ import de.ellpeck.prettypipes.Registry;
 import de.ellpeck.prettypipes.pipe.ConnectionType;
 import de.ellpeck.prettypipes.pipe.IPipeConnectable;
 import de.ellpeck.prettypipes.pipe.PipeBlock;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import de.ellpeck.prettypipes.pipe.PipeBlockEntity;
+import dev.quarris.ppfluids.ModContent;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
+import org.jetbrains.annotations.Nullable;
 
 public class FluidPipeBlock extends PipeBlock {
 
     @Override
-    public TileEntity createNewTileEntity(IBlockReader worldIn) {
-        return new FluidPipeTileEntity();
+    public @Nullable BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return new FluidPipeBlockEntity(pos, state);
     }
 
     @Override
-    public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult result) {
-        return super.onBlockActivated(state, worldIn, pos, player, handIn, result);
+    public @Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+        return createTickerHelper(type, ModContent.FLUID_PIPE_TILE.get(), PipeBlockEntity::tick);
     }
 
     @Override
-    protected ConnectionType getConnectionType(World world, BlockPos pos, Direction direction, BlockState state) {
-        BlockPos offset = pos.offset(direction);
-        if (!world.isBlockLoaded(offset)) {
+    protected ConnectionType getConnectionType(Level level, BlockPos pos, Direction direction, BlockState state) {
+        BlockPos offset = pos.relative(direction);
+        if (!level.isLoaded(offset)) {
             return ConnectionType.DISCONNECTED;
         }
 
         Direction opposite = direction.getOpposite();
 
-        TileEntity tile = world.getTileEntity(offset);
+        BlockEntity tile = level.getBlockEntity(offset);
         if (tile != null) {
             IPipeConnectable connectable = tile.getCapability(Registry.pipeConnectableCapability, opposite).orElse(null);
             if (connectable != null)
@@ -48,9 +48,9 @@ public class FluidPipeBlock extends PipeBlock {
             }
         }
 
-        BlockState offState = world.getBlockState(offset);
-        if (hasLegsTo(world, offState, offset, direction)) {
-            if (DIRECTIONS.values().stream().noneMatch((d) -> state.get(d) == ConnectionType.LEGS)) {
+        BlockState offState = level.getBlockState(offset);
+        if (hasLegsTo(level, offState, offset, direction)) {
+            if (DIRECTIONS.values().stream().noneMatch((d) -> state.getValue(d) == ConnectionType.LEGS)) {
                 return ConnectionType.LEGS;
             }
         }

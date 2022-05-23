@@ -3,13 +3,13 @@ package dev.quarris.ppfluids.pipenetwork;
 import de.ellpeck.prettypipes.misc.ItemEquality;
 import de.ellpeck.prettypipes.network.NetworkLocation;
 import de.ellpeck.prettypipes.network.PipeNetwork;
-import de.ellpeck.prettypipes.pipe.PipeTileEntity;
-import dev.quarris.ppfluids.pipe.FluidPipeTileEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import de.ellpeck.prettypipes.pipe.PipeBlockEntity;
+import dev.quarris.ppfluids.pipe.FluidPipeBlockEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.IItemHandler;
@@ -24,34 +24,33 @@ public class FluidNetworkLocation extends NetworkLocation {
 
     private Map<Integer, FluidStack> fluidCache;
     private IFluidHandler handlerCache;
-
     public FluidNetworkLocation(BlockPos pipePos, Direction direction) {
         super(pipePos, direction);
     }
 
-    public FluidNetworkLocation(CompoundNBT nbt) {
+    public FluidNetworkLocation(CompoundTag nbt) {
         super(nbt);
     }
 
-    public List<Integer> getFluidSlots(World world, FluidStack fluid) {
-        if (this.isEmpty(world))
+    public List<Integer> getFluidSlots(Level level, FluidStack fluid) {
+        if (this.isEmpty(level))
             return Collections.emptyList();
-        return this.getFluids(world).entrySet().stream()
-                .filter(kv -> kv.getValue().isFluidEqual(fluid) && this.canExtract(world, kv.getKey()))
+        return this.getFluids(level).entrySet().stream()
+                .filter(kv -> kv.getValue().isFluidEqual(fluid) && this.canExtract(level, kv.getKey()))
                 .map(Map.Entry::getKey).collect(Collectors.toList());
     }
 
-    public int getFluidAmount(World world, FluidStack fluid) {
-        if (this.isEmpty(world))
+    public int getFluidAmount(Level level, FluidStack fluid) {
+        if (this.isEmpty(level))
             return 0;
-        return this.getFluids(world).entrySet().stream()
-                .filter(kv -> kv.getValue().isFluidEqual(fluid) && this.canExtract(world, kv.getKey()))
+        return this.getFluids(level).entrySet().stream()
+                .filter(kv -> kv.getValue().isFluidEqual(fluid) && this.canExtract(level, kv.getKey()))
                 .mapToInt(kv -> kv.getValue().getAmount()).sum();
     }
 
-    public Map<Integer, FluidStack> getFluids(World world) {
+    public Map<Integer, FluidStack> getFluids(Level level) {
         if (this.fluidCache == null) {
-            IFluidHandler handler = this.getFluidHandler(world);
+            IFluidHandler handler = this.getFluidHandler(level);
             if (handler != null) {
                 for (int i = 0; i < handler.getTanks(); i++) {
                     FluidStack stack = handler.getFluidInTank(i);
@@ -66,20 +65,20 @@ public class FluidNetworkLocation extends NetworkLocation {
         return this.fluidCache;
     }
 
-    public IFluidHandler getFluidHandler(World world) {
+    public IFluidHandler getFluidHandler(Level level) {
         if (this.handlerCache == null) {
-            PipeNetwork network = PipeNetwork.get(world);
-            PipeTileEntity pipe = network.getPipe(this.pipePos);
-            if (!(pipe instanceof FluidPipeTileEntity))
+            PipeNetwork network = PipeNetwork.get(level);
+            PipeBlockEntity pipe = network.getPipe(this.pipePos);
+            if (!(pipe instanceof FluidPipeBlockEntity))
                 throw new IllegalArgumentException(String.format("Pipe at %s is not a Fluid Pipe for a FluidNetworkLocation instance. Please report to PrettyPipesFluids issues.", this.pipePos));
-            this.handlerCache = ((FluidPipeTileEntity) pipe).getAdjacentFluidHandler(this.direction);
+            this.handlerCache = ((FluidPipeBlockEntity) pipe).getAdjacentFluidHandler(this.direction);
         }
         return this.handlerCache;
     }
 
     @Override
-    public boolean canExtract(World world, int slot) {
-        IFluidHandler handler = this.getFluidHandler(world);
+    public boolean canExtract(Level level, int slot) {
+        IFluidHandler handler = this.getFluidHandler(level);
         if (handler == null)
             return false;
         FluidStack stored = handler.getFluidInTank(slot).copy();
@@ -88,28 +87,28 @@ public class FluidNetworkLocation extends NetworkLocation {
     }
 
     @Override
-    public boolean isEmpty(World world) {
-        Map<Integer, FluidStack> fluids = this.getFluids(world);
+    public boolean isEmpty(Level level) {
+        Map<Integer, FluidStack> fluids = this.getFluids(level);
         return fluids == null || fluids.isEmpty();
     }
 
     @Override
-    public IItemHandler getItemHandler(World world) {
+    public IItemHandler getItemHandler(Level le) {
         throw new UnsupportedOperationException("getItemHandler is unsupported for FluidNetworkLocation");
     }
 
     @Override
-    public Map<Integer, ItemStack> getItems(World world) {
+    public Map<Integer, ItemStack> getItems(Level level) {
         throw new UnsupportedOperationException("getItems is unsupported for FluidNetworkLocation");
     }
 
     @Override
-    public List<Integer> getStackSlots(World world, ItemStack stack, ItemEquality... equalityTypes) {
+    public List<Integer> getStackSlots(Level level, ItemStack stack, ItemEquality... equalityTypes) {
         throw new UnsupportedOperationException("getStackSlots is unsupported for FluidNetworkLocation");
     }
 
     @Override
-    public int getItemAmount(World world, ItemStack stack, ItemEquality... equalityTypes) {
+    public int getItemAmount(Level level, ItemStack stack, ItemEquality... equalityTypes) {
         throw new UnsupportedOperationException("getItemAmount is unsupported for FluidNetworkLocation");
     }
 }

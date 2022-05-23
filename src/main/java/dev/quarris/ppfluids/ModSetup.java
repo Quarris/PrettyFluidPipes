@@ -4,14 +4,13 @@ import de.ellpeck.prettypipes.pipe.PipeRenderer;
 import dev.quarris.ppfluids.client.FluidExtractionModuleScreen;
 import dev.quarris.ppfluids.client.FluidFilterModuleScreen;
 import dev.quarris.ppfluids.client.FluidRetrievalModuleScreen;
-import dev.quarris.ppfluids.container.FluidRetrievalModuleContainer;
 import dev.quarris.ppfluids.network.PacketHandler;
-import net.minecraft.client.gui.ScreenManager;
+import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.RenderTypeLookup;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -29,11 +28,15 @@ public class ModSetup {
 
         @SubscribeEvent
         public static void setup(FMLClientSetupEvent event) {
-            RenderTypeLookup.setRenderLayer(ModContent.FLUID_PIPE, RenderType.getCutout());
-            ClientRegistry.bindTileEntityRenderer(ModContent.FLUID_PIPE_TILE, PipeRenderer::new);
-            ScreenManager.registerFactory(ModContent.FLUID_FILTER_CONTAINER, FluidFilterModuleScreen::new);
-            ScreenManager.registerFactory(ModContent.FLUID_EXTRACTION_CONTAINER, FluidExtractionModuleScreen::new);
-            ScreenManager.registerFactory(ModContent.FLUID_RETRIEVAL_CONTAINER, FluidRetrievalModuleScreen::new);
+            ItemBlockRenderTypes.setRenderLayer(ModContent.FLUID_PIPE.get(), RenderType.cutout());
+            MenuScreens.register(ModContent.FLUID_FILTER_CONTAINER.get(), FluidFilterModuleScreen::new);
+            MenuScreens.register(ModContent.FLUID_EXTRACTION_CONTAINER.get(), FluidExtractionModuleScreen::new);
+            MenuScreens.register(ModContent.FLUID_RETRIEVAL_CONTAINER.get(), FluidRetrievalModuleScreen::new);
+        }
+
+        @SubscribeEvent
+        public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
+            event.registerBlockEntityRenderer(ModContent.FLUID_PIPE_TILE.get(), PipeRenderer::new);
         }
     }
 }
