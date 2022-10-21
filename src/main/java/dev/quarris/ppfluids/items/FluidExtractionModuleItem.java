@@ -3,6 +3,7 @@ package dev.quarris.ppfluids.items;
 import de.ellpeck.prettypipes.items.IModule;
 import de.ellpeck.prettypipes.items.ModuleItem;
 import de.ellpeck.prettypipes.items.ModuleTier;
+import de.ellpeck.prettypipes.misc.DirectionSelector;
 import de.ellpeck.prettypipes.pipe.PipeBlockEntity;
 import de.ellpeck.prettypipes.pipe.containers.AbstractPipeContainer;
 import dev.quarris.ppfluids.ModContent;
@@ -18,7 +19,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 
-public class FluidExtractionModuleItem extends ModuleItem implements IFluidFilterProvider {
+public class FluidExtractionModuleItem extends FluidModuleItem implements IFluidFilterProvider {
 
     private final int maxExtraction;
     private final int speed;
@@ -28,21 +29,16 @@ public class FluidExtractionModuleItem extends ModuleItem implements IFluidFilte
     public FluidExtractionModuleItem(String name, ModuleTier tier) {
         super(name);
         this.maxExtraction = tier.forTier(500, 2000, 8000);
-        this.speed = tier.forTier(20, 15, 10);
+        this.speed = tier.forTier(40, 20, 10);
         this.filterSlots = tier.forTier(2, 4, 8);
         this.preventOversending = tier.forTier(true, true, true);
     }
 
     @Override
     public void tick(ItemStack module, PipeBlockEntity tile) {
-        if (tile.getLevel().getGameTime() % this.speed != 0)
-            return;
-        if (!tile.canWork())
-            return;
-        if (!(tile instanceof FluidPipeBlockEntity))
+        if (!(tile instanceof FluidPipeBlockEntity fluidPipe) || !tile.shouldWorkNow(this.speed) || !tile.canWork())
             return;
 
-        FluidPipeBlockEntity fluidPipe = (FluidPipeBlockEntity) tile;
         FluidFilter filter = new FluidFilter(this.filterSlots, module, fluidPipe);
 
         for (Direction dir : Direction.values()) {
@@ -71,11 +67,13 @@ public class FluidExtractionModuleItem extends ModuleItem implements IFluidFilte
         return tile instanceof FluidPipeBlockEntity && !(iModule instanceof FluidExtractionModuleItem);
     }
 
-    public boolean canNetworkSee(ItemStack module, PipeBlockEntity tile) {
+    @Override
+    public boolean canNetworkSee(ItemStack module, PipeBlockEntity pipe, Direction dir, IFluidHandler destination) {
         return false;
     }
 
-    public boolean canAcceptItem(ItemStack module, PipeBlockEntity tile, ItemStack stack) {
+    @Override
+    public boolean canAcceptItem(ItemStack module, PipeBlockEntity pipe, ItemStack stack, Direction dir, IFluidHandler destination) {
         return false;
     }
 
@@ -85,6 +83,11 @@ public class FluidExtractionModuleItem extends ModuleItem implements IFluidFilte
 
     public AbstractPipeContainer<?> getContainer(ItemStack module, PipeBlockEntity tile, int windowId, Inventory inv, Player player, int moduleIndex) {
         return new FluidExtractionModuleContainer(ModContent.FLUID_EXTRACTION_CONTAINER.get(), windowId, player, tile.getBlockPos(), moduleIndex);
+    }
+
+    @Override
+    public DirectionSelector getDirectionSelector(ItemStack module, PipeBlockEntity tile) {
+        return new DirectionSelector(module, tile);
     }
 
     public FluidFilter getFluidFilter(ItemStack module, FluidPipeBlockEntity tile) {

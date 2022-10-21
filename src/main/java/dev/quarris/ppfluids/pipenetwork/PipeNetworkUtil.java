@@ -38,15 +38,15 @@ public class PipeNetworkUtil {
 
         network.startProfile("find_fluid_destination");
         List<BlockPos> nodes = network.getOrderedNetworkNodes(inputPipePos).stream()
-                .filter(level::isLoaded)
-                .filter(pos -> level.getBlockEntity(pos) instanceof FluidPipeBlockEntity)
-                .collect(Collectors.toList());
+            .filter(level::isLoaded)
+            .filter(pos -> level.getBlockEntity(pos) instanceof FluidPipeBlockEntity)
+            .collect(Collectors.toList());
 
         for (int i = 0; i < nodes.size(); ++i) {
             BlockPos pipePos = nodes.get(inputPipe.getNextNode(nodes, i));
             if (level.isLoaded(pipePos)) {
                 FluidPipeBlockEntity pipe = (FluidPipeBlockEntity) network.getPipe(pipePos);
-                Pair<BlockPos, ItemStack> dest = pipe.getAvailableDestination(fluid.copy(), false, preventOversending);
+                Pair<BlockPos, ItemStack> dest = pipe.getAvailableDestination(Direction.values(), fluid.copy(), false, preventOversending);
                 if (dest != null && !dest.getLeft().equals(inputTankPos)) {
                     Function<Float, IPipeItem> sup = (speed) -> itemSupplier.apply(dest.getRight(), speed);
                     if (network.routeItemToLocation(inputPipePos, inputTankPos, pipe.getBlockPos(), dest.getLeft(), dest.getRight(), sup)) {
@@ -115,18 +115,18 @@ public class PipeNetworkUtil {
         for (BlockPos dest : network.getOrderedNetworkNodes(node)) {
             if (!level.isLoaded(dest))
                 continue;
-            PipeBlockEntity pipe = network.getPipe(dest);
-            if (!(pipe instanceof FluidPipeBlockEntity))
+            PipeBlockEntity block = network.getPipe(dest);
+            if (!(block instanceof FluidPipeBlockEntity pipe))
                 continue;
 
-            if (!pipe.canNetworkSee())
-                continue;
-
-            FluidPipeBlockEntity fluidPipe = (FluidPipeBlockEntity) pipe;
             for (Direction dir : Direction.values()) {
-                IFluidHandler handler = fluidPipe.getAdjacentFluidHandler(dir);
+                IFluidHandler handler = pipe.getAdjacentFluidHandler(dir);
                 if (handler == null)
                     continue;
+
+                if (!pipe.canNetworkSee(dir, handler))
+                    continue;
+
                 // check if this handler already exists (double-connected pipes, double chests etc.)
                 if (info.stream().anyMatch(l -> handler.equals(l.getFluidHandler(level))))
                     continue;

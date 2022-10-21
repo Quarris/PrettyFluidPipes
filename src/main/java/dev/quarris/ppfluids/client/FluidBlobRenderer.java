@@ -28,21 +28,28 @@ public class FluidBlobRenderer {
     private static final FluidBlobModel MODEL = new FluidBlobModel(FluidBlobModel.createBlobLayer().bakeRoot());
 
     public static void render(FluidPipeItem item, PoseStack matrix, Random random, float partialTicks, int light, int overlay, MultiBufferSource buffer) {
+        long time = item.getTicksExisted();
+        float lastSizeOffset = (float) (Math.sin(Math.toRadians((time - 1) * 10)) + 1) / 30;
+        float thisSizeOffset = (float) (Math.sin(Math.toRadians(time * 10)) + 1) / 30;
+        float sizeOffset = (Mth.lerp(partialTicks, lastSizeOffset, thisSizeOffset));
         FluidStack fluidStack = item.getFluidContent();
         Fluid fluid = fluidStack.getFluid();
-        float size = Mth.lerp(Math.min(1, fluidStack.getAmount() / 2000f), 0.1f, 0.25f);
+        float size = Mth.lerp(Math.min(1, fluidStack.getAmount() / 2000f), 0.1f - sizeOffset, 0.25f + sizeOffset);
         int color = fluid.getAttributes().getColor(fluidStack);
         float r = ((color >> 16) & 0xFF) / 255f; // red
         float g = ((color >> 8) & 0xFF) / 255f; // green
         float b = ((color >> 0) & 0xFF) / 255f; // blue
         float a = ((color >> 24) & 0xFF) / 255f; // alpha
 
-        TextureAtlasSprite sprite = getFluidStillSprite(fluid);
+        float tx = Mth.lerp(partialTicks, item.lastX, item.x);
+        float ty = Mth.lerp(partialTicks, item.lastY, item.y);
+        float tz = Mth.lerp(partialTicks, item.lastZ, item.z);
 
+        TextureAtlasSprite sprite = getFluidStillSprite(fluid);
         VertexConsumer vbuf = sprite.wrap(buffer.getBuffer(RenderType.entityTranslucent(sprite.atlas().location())));
 
         matrix.pushPose();
-        matrix.translate(item.x, item.y, item.z);
+        matrix.translate(tx, ty, tz);
         matrix.scale(size, size, size);
         MODEL.renderToBuffer(matrix, vbuf, light, overlay, r, g, b, a);
         matrix.popPose();

@@ -1,10 +1,13 @@
 package dev.quarris.ppfluids.pipe;
 
+import de.ellpeck.prettypipes.items.IModule;
 import de.ellpeck.prettypipes.network.PipeNetwork;
+import de.ellpeck.prettypipes.pipe.IPipeConnectable;
 import de.ellpeck.prettypipes.pipe.PipeBlockEntity;
 import dev.quarris.ppfluids.ModContent;
 import dev.quarris.ppfluids.items.FluidItem;
 import dev.quarris.ppfluids.items.IFluidFilterProvider;
+import dev.quarris.ppfluids.items.IFluidModule;
 import dev.quarris.ppfluids.misc.FluidFilter;
 import dev.quarris.ppfluids.pipenetwork.FluidPipeItem;
 import net.minecraft.core.BlockPos;
@@ -28,51 +31,63 @@ public class FluidPipeBlockEntity extends PipeBlockEntity {
         this.type = ModContent.FLUID_PIPE_TILE.get();
     }
 
-    public Pair<BlockPos, ItemStack> getAvailableDestination(FluidStack fluid, boolean force, boolean preventOversending) {
+    @Override
+    public Pair<BlockPos, ItemStack> getAvailableDestinationOrConnectable(ItemStack stack, boolean force, boolean preventOversending) {
+        return super.getAvailableDestinationOrConnectable(stack, force, preventOversending);
+    }
+
+    @Override
+    public Pair<BlockPos, ItemStack> getAvailableDestination(Direction[] directions, ItemStack stack, boolean force, boolean preventOversending) {
+        return super.getAvailableDestination(directions, stack, force, preventOversending);
+    }
+
+    public Pair<BlockPos, ItemStack> getAvailableDestination(Direction[] directions, FluidStack fluid, boolean force, boolean preventOversending) {
         if (!this.canWork()) {
             return null;
         }
-        if (!force && this.streamModules().anyMatch(m -> !(m.getRight()).canAcceptItem(m.getLeft(), this, FluidItem.createItemFromFluid(fluid, false)))) {
-            return null;
-        }
 
-        for (Direction dir : Direction.values()) {
+        for (Direction dir : directions) {
             IFluidHandler tank = this.getAdjacentFluidHandler(dir);
-            if (tank != null) {
-                int amountFilled = tank.fill(fluid, IFluidHandler.FluidAction.SIMULATE);
-                if (amountFilled > 0) {
-                    FluidStack toInsert = fluid.copy();
-                    toInsert.setAmount(amountFilled);
-                    // TODO Replace maxAmount once a limiting module is implemented
-                    int maxAmount = Integer.MAX_VALUE;
-                    //int maxAmount = this.streamModules().mapToInt((m) -> ((IModule)m.getRight()).getMaxInsertionAmount(m.getLeft(), this, stack, handler)).min().orElse(Integer.MAX_VALUE);
-                    if (maxAmount < toInsert.getAmount()) {
-                        toInsert.setAmount(maxAmount);
-                    }
+            if (tank == null)
+                continue;
 
-                    BlockPos tankPos = this.getBlockPos().relative(dir);
-                    if (preventOversending || maxAmount < Integer.MAX_VALUE) {
-                        PipeNetwork network = PipeNetwork.get(this.level);
-                        int onTheWay = network.getPipeItemsOnTheWay(tankPos)
-                                .filter(item -> item instanceof FluidPipeItem)
-                                .map(item -> (FluidPipeItem) item)
-                                .filter(item -> toInsert.getFluid().isSame(item.getFluidContent().getFluid()))
-                                .mapToInt(item -> item.getFluidContent().getAmount())
-                                .sum();
+            if (!force && this.streamModules().filter(m -> m.getRight() instanceof IFluidModule)
+                .anyMatch(m -> !((IFluidModule) m.getRight()).canAcceptItem(m.getLeft(), this, FluidItem.createItemFromFluid(fluid, false), dir, tank))) {
+                continue;
+            }
+            int amountFilled = tank.fill(fluid, IFluidHandler.FluidAction.SIMULATE);
+            if (amountFilled > 0) {
+                FluidStack toInsert = fluid.copy();
+                toInsert.setAmount(amountFilled);
+                // TODO Replace maxAmount once a limiting module is implemented
+                int maxAmount = Integer.MAX_VALUE;
+                //int maxAmount = this.streamModules().mapToInt((m) -> ((IModule)m.getRight()).getMaxInsertionAmount(m.getLeft(), this, stack, handler)).min().orElse(Integer.MAX_VALUE);
+                if (maxAmount < toInsert.getAmount()) {
+                    toInsert.setAmount(maxAmount);
+                }
 
-                        if (onTheWay > 0) {
-                            FluidStack copy = toInsert.copy();
-                            copy.setAmount(Integer.MAX_VALUE);
-                            int totalSpace = tank.fill(copy, IFluidHandler.FluidAction.SIMULATE);
-                            if (onTheWay + toInsert.getAmount() > totalSpace) {
-                                toInsert.setAmount(totalSpace - onTheWay);
-                            }
+                BlockPos tankPos = this.getBlockPos().relative(dir);
+                if (preventOversending || maxAmount < Integer.MAX_VALUE) {
+                    PipeNetwork network = PipeNetwork.get(this.level);
+                    int onTheWay = network.getPipeItemsOnTheWay(tankPos)
+                        .filter(item -> item instanceof FluidPipeItem)
+                        .map(item -> (FluidPipeItem) item)
+                        .filter(item -> toInsert.getFluid().isSame(item.getFluidContent().getFluid()))
+                        .mapToInt(item -> item.getFluidContent().getAmount())
+                        .sum();
+
+                    if (onTheWay > 0) {
+                        FluidStack copy = toInsert.copy();
+                        copy.setAmount(Integer.MAX_VALUE);
+                        int availableSpace = tank.fill(copy, IFluidHandler.FluidAction.SIMULATE);
+                        if (onTheWay + toInsert.getAmount() > availableSpace) {
+                            toInsert.setAmount(availableSpace - onTheWay);
                         }
                     }
+                }
 
-                    if (!toInsert.isEmpty()) {
-                        return Pair.of(tankPos, FluidItem.createItemFromFluid(toInsert, false));
-                    }
+                if (!toInsert.isEmpty()) {
+                    return Pair.of(tankPos, FluidItem.createItemFromFluid(toInsert, false));
                 }
             }
         }
@@ -81,13 +96,33 @@ public class FluidPipeBlockEntity extends PipeBlockEntity {
     }
 
     @Override
-    public Pair<BlockPos, ItemStack> getAvailableDestination(ItemStack stack, boolean force, boolean preventOversending) {
-        return null;
+    public boolean canNetworkSee(Direction direction, IItemHandler handler) {
+        return false;
+    }
+
+    public boolean canNetworkSee(Direction direction, IFluidHandler handler) {
+        return this.streamModules().filter(m -> m.getRight() instanceof IFluidModule).allMatch((m) -> ((IFluidModule) m.getRight()).canNetworkSee(m.getLeft(), this, direction, handler));
     }
 
     @Override
-    public boolean isConnectedInventory(Direction dir) {
-        return this.getAdjacentFluidHandler(dir) != null;
+    public boolean canHaveModules() {
+        for(Direction dir : Direction.values()) {
+            if (this.getAdjacentFluidHandler(dir) != null) {
+                return true;
+            }
+
+            IPipeConnectable connectable = this.getPipeConnectable(dir);
+            if (connectable != null && connectable.allowsModules(this.worldPosition, dir)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean isConnected(Direction dir) {
+        return super.isConnected(dir); //this.getAdjacentFluidHandler(dir) != null;
     }
 
     public IFluidHandler getAdjacentFluidHandler(Direction dir) {
@@ -118,8 +153,8 @@ public class FluidPipeBlockEntity extends PipeBlockEntity {
 
     public List<FluidFilter> getFluidFilters() {
         return this.streamModules()
-                .filter(p -> p.getRight() instanceof IFluidFilterProvider)
-                .map(p -> ((IFluidFilterProvider) p.getRight()).getFluidFilter(p.getLeft(), this))
-                .collect(Collectors.toList());
+            .filter(p -> p.getRight() instanceof IFluidFilterProvider)
+            .map(p -> ((IFluidFilterProvider) p.getRight()).getFluidFilter(p.getLeft(), this))
+            .collect(Collectors.toList());
     }
 }

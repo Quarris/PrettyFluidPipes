@@ -29,6 +29,8 @@ public class FluidPipeItem extends PipeItem {
 
     public static final ResourceLocation FLUID_TYPE = new ResourceLocation("prettypipes", "pipe_fluid");
 
+    private long ticksExisted;
+
     public FluidPipeItem(ItemStack stack, float speed) {
         super(FLUID_TYPE, stack, speed);
     }
@@ -39,6 +41,7 @@ public class FluidPipeItem extends PipeItem {
 
     public FluidPipeItem(ResourceLocation type, CompoundTag nbt) {
         super(type, nbt);
+        this.ticksExisted = nbt.getLong("TicksExisted");
     }
 
     public FluidStack getFluidContent() {
@@ -50,10 +53,20 @@ public class FluidPipeItem extends PipeItem {
     }
 
     @Override
+    public void updateInPipe(PipeBlockEntity currPipe) {
+        super.updateInPipe(currPipe);
+        this.ticksExisted++;
+    }
+
+    @Override
     public void drop(Level level, ItemStack stack) {
         if (ModConfig.dropFluidContainers.get()) {
             super.drop(level, stack);
         }
+    }
+
+    public long getTicksExisted() {
+        return this.ticksExisted;
     }
 
     @Override
@@ -96,6 +109,13 @@ public class FluidPipeItem extends PipeItem {
         }
 
         return super.store(currPipe);
+    }
+
+    @Override
+    public CompoundTag serializeNBT() {
+        CompoundTag tag = super.serializeNBT();
+        tag.putLong("TicksExisted", this.ticksExisted);
+        return tag;
     }
 
     @OnlyIn(Dist.CLIENT)

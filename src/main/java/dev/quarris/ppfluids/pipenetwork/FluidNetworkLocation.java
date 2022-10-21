@@ -24,6 +24,7 @@ public class FluidNetworkLocation extends NetworkLocation {
 
     private Map<Integer, FluidStack> fluidCache;
     private IFluidHandler handlerCache;
+
     public FluidNetworkLocation(BlockPos pipePos, Direction direction) {
         super(pipePos, direction);
     }
@@ -63,6 +64,15 @@ public class FluidNetworkLocation extends NetworkLocation {
             }
         }
         return this.fluidCache;
+    }
+
+    public FluidStack getFirstAvailableFluid(Level level) {
+        for (var entry : this.getFluids(level).entrySet()) {
+            if (this.canExtract(level, entry.getKey())) {
+                return entry.getValue();
+            }
+        }
+        return FluidStack.EMPTY;
     }
 
     public IFluidHandler getFluidHandler(Level level) {

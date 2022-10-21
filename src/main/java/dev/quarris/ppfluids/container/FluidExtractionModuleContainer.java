@@ -1,5 +1,6 @@
 package dev.quarris.ppfluids.container;
 
+import de.ellpeck.prettypipes.misc.DirectionSelector;
 import de.ellpeck.prettypipes.pipe.containers.AbstractPipeContainer;
 import dev.quarris.ppfluids.items.FluidExtractionModuleItem;
 import dev.quarris.ppfluids.misc.FluidFilter;
@@ -9,14 +10,14 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class FluidExtractionModuleContainer extends AbstractPipeContainer<FluidExtractionModuleItem> implements FluidFilter.IFluidFilteredContainer {
+public class FluidExtractionModuleContainer extends AbstractPipeContainer<FluidExtractionModuleItem> implements FluidFilter.IFluidFilteredContainer, DirectionSelector.IDirectionContainer {
 
     private FluidFilter filter;
+    private DirectionSelector directionSelector;
 
     public FluidExtractionModuleContainer(@Nullable MenuType<?> type, int id, Player player, BlockPos pos, int moduleIndex) {
         super(type, id, player, pos, moduleIndex);
@@ -24,7 +25,8 @@ public class FluidExtractionModuleContainer extends AbstractPipeContainer<FluidE
 
     @Override
     protected void addSlots() {
-        this.filter = this.module.getFluidFilter(this.moduleStack, (FluidPipeBlockEntity)this.tile);
+        this.filter = this.module.getFluidFilter(this.moduleStack, (FluidPipeBlockEntity) this.tile);
+        this.directionSelector = this.module.getDirectionSelector(this.moduleStack, this.tile);
         List<Slot> filterSlots = this.filter.createContainerSlots((176 - Math.min(this.module.filterSlots, 9) * 18) / 2 + 1, 49);
         for (Slot slot : filterSlots) {
             this.addSlot(slot);
@@ -46,5 +48,10 @@ public class FluidExtractionModuleContainer extends AbstractPipeContainer<FluidE
     @Override
     public FluidFilter getFilter() {
         return this.filter;
+    }
+
+    @Override
+    public DirectionSelector getSelector() {
+        return this.directionSelector;
     }
 }

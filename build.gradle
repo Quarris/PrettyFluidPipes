@@ -105,7 +105,7 @@ repositories {
 dependencies {
     minecraft "net.minecraftforge:forge:${mc_version}-${forge_version}"
     runtimeOnly fg.deobf('curse.maven:ITank-256991:3697465')
-    implementation fg.deobf('curse.maven:PrettyPipes-376737:3798343')
+    implementation fg.deobf("curse.maven:PrettyPipes-376737:${pp_curse_version}")
     runtimeOnly fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}")
     //runtimeOnly fg.deobf('curse.maven:Jei-238222:3681294')
     //implementation fg.deobf("de.ellpeck.prettypipes:PrettyPipes:${pp_version}")

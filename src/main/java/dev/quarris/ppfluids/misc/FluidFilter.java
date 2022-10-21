@@ -37,15 +37,19 @@ public class FluidFilter extends ItemStackHandler implements INBTSerializable<Co
     public boolean isWhitelist;
     public boolean canModifyWhitelist = true;
     private boolean modified;
-
-    public FluidFilter(int size, ItemStack moduleItem, FluidPipeBlockEntity pipe) {
+    public FluidFilter(int size, ItemStack moduleItem, FluidPipeBlockEntity pipe, boolean isDefaultWhitelist) {
         super(size);
         this.filters = NonNullList.withSize(size, FluidStack.EMPTY);
         this.pipe = pipe;
         this.moduleItem = moduleItem;
+        this.isWhitelist = isDefaultWhitelist;
         if (moduleItem.hasTag() && moduleItem.getTag().contains("filter")) {
             this.deserializeNBT(moduleItem.getTag().getCompound("filter"));
         }
+    }
+
+    public FluidFilter(int size, ItemStack moduleItem, FluidPipeBlockEntity pipe) {
+        this(size, moduleItem, pipe, false);
     }
 
     public boolean isAllowed(ItemStack stack) {
@@ -168,7 +172,8 @@ public class FluidFilter extends ItemStackHandler implements INBTSerializable<Co
     @Override
     public void deserializeNBT(CompoundTag nbt) {
         ListTag fluidList = nbt.getList("fluids", CompoundTag.TAG_COMPOUND);
-        for (int i = 0; i < fluidList.size(); i++) {
+        int size = Math.min(fluidList.size(), this.filters.size());
+        for (int i = 0; i < size; i++) {
             CompoundTag fluidNBT = fluidList.getCompound(i);
             FluidStack fluid = FluidStack.loadFluidStackFromNBT(fluidNBT);
             this.filters.set(i, fluid);
