@@ -15,12 +15,13 @@ public class FluidExtractionModuleScreen extends AbstractPipeGui<FluidExtraction
         super(screenContainer, inv, titleIn);
     }
 
+    @Override
     protected void init() {
         super.init();
-        List<AbstractWidget> buttons = this.menu.getFilter().createScreenButtons(this, this.leftPos + 7, this.topPos + 17 + 32 + 18 * Mth.ceil((float)(this.menu).getFilter().size() / 9.0F) + 2);
-
-        for (AbstractWidget button : buttons) {
+        for (AbstractWidget button : this.menu.getFilter().createButtons(this, this.leftPos + this.imageWidth - 7, this.topPos + 17 + 32 + 20)) {
             this.addRenderableWidget(button);
         }
+
+        this.addRenderableWidget(this.menu.getSelector().getButton(this.leftPos + 7, this.topPos + 17 + 32 + 20));
     }
 }

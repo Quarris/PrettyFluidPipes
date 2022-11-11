@@ -11,35 +11,35 @@ import org.apache.logging.log4j.util.TriConsumer;
 
 import java.util.function.Supplier;
 
-public class ButtonPacket {
+public class FluidButtonPacket {
     private BlockPos pos;
     private ButtonResult result;
     private int[] data;
 
-    public ButtonPacket(BlockPos pos, ButtonResult result, int... data) {
+    public FluidButtonPacket(BlockPos pos, ButtonResult result, int... data) {
         this.pos = pos;
         this.result = result;
         this.data = data;
     }
 
-    private ButtonPacket() {
+    private FluidButtonPacket() {
     }
 
-    public static ButtonPacket decode(FriendlyByteBuf buf) {
-        ButtonPacket packet = new ButtonPacket();
+    public static FluidButtonPacket decode(FriendlyByteBuf buf) {
+        FluidButtonPacket packet = new FluidButtonPacket();
         packet.pos = buf.readBlockPos();
         packet.result = ButtonResult.values()[buf.readByte()];
         packet.data = buf.readVarIntArray();
         return packet;
     }
 
-    public static void encode(ButtonPacket packet, FriendlyByteBuf buf) {
+    public static void encode(FluidButtonPacket packet, FriendlyByteBuf buf) {
         buf.writeBlockPos(packet.pos);
         buf.writeByte(packet.result.ordinal());
         buf.writeVarIntArray(packet.data);
     }
 
-    public static void handle(final ButtonPacket message, final Supplier<NetworkEvent.Context> ctx) {
+    public static void handle(final FluidButtonPacket message, final Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
             Player player = ctx.get().getSender();
             message.result.action.accept(message.pos, message.data, player);
@@ -48,7 +48,7 @@ public class ButtonPacket {
     }
 
     public static void sendAndExecute(BlockPos pos, ButtonResult result, int... data) {
-        PacketHandler.sendToServer(new ButtonPacket(pos, result, data));
+        PacketHandler.sendToServer(new FluidButtonPacket(pos, result, data));
         result.action.accept(pos, data, Minecraft.getInstance().player);
     }
 
@@ -56,7 +56,7 @@ public class ButtonPacket {
         FILTER_CHANGE((pos, data, player) -> {
             IFluidFilteredContainer container = (IFluidFilteredContainer)player.containerMenu;
             FluidFilter filter = container.getFilter();
-            filter.onButtonPacket(data[0]);
+            filter.onButtonPacket(container, data[0]);
         });
 
         public final TriConsumer<BlockPos, int[], Player> action;

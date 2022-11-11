@@ -7,20 +7,21 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
+import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 
 public class FluidFilterSlot extends SlotItemHandler {
 
-    private final FluidFilter filter;
+    //private final FluidFilter filter;
     private final int index;
 
-    public FluidFilterSlot(FluidFilter filter, int index, int xPosition, int yPosition) {
-        super(filter, index, xPosition, yPosition);
+    public FluidFilterSlot(IItemHandler handler, int index, int xPosition, int yPosition) {
+        super(handler, index, xPosition, yPosition);
         this.index = index;
-        this.filter = filter;
+        //this.filter = handler;
     }
 
-    public static boolean isFilterSlot(AbstractContainerMenu container, int slotId, Player player) {
+    public static boolean clickFilter(AbstractContainerMenu container, int slotId, Player player) {
         if (slotId >= 0 && slotId < container.slots.size()) {
             Slot slot = container.getSlot(slotId);
             if (slot instanceof FluidFilterSlot) {
@@ -47,13 +48,13 @@ public class FluidFilterSlot extends SlotItemHandler {
     }
 
     public void putFluidStack(FluidStack stack) {
-        this.filter.setFilter(this.index, stack);
+        //this.filter.setFilter(this.index, stack);
         this.setChanged();
     }
 
     @Override
     public void setChanged() {
-        this.filter.setModified(true);
+        //this.filter.setModified(true);
     }
 
     @Override

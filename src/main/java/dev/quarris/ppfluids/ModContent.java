@@ -41,9 +41,9 @@ public class ModContent {
 
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, ModRef.ID);
 
-    public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITIES, ModRef.ID);
+    public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, ModRef.ID);
 
-    public static final DeferredRegister<MenuType<?>> MENU_TYPES = DeferredRegister.create(ForgeRegistries.CONTAINERS, ModRef.ID);
+    public static final DeferredRegister<MenuType<?>> MENU_TYPES = DeferredRegister.create(ForgeRegistries.MENU_TYPES, ModRef.ID);
 
     // Blocks
     public static final RegistryObject<Block> FLUID_PIPE = BLOCKS.register("fluid_pipe", FluidPipeBlock::new);
@@ -73,7 +73,7 @@ public class ModContent {
         MENU_TYPES.register(bus);
     }
 
-    private static Item[] createTieredModule(String name, BiFunction<String, ModuleTier, ModuleItem> item) {
+    /*private static Item[] createTieredModule(String name, BiFunction<String, ModuleTier, ModuleItem> item) {
         Item[] items = new Item[ModuleTier.values().length];
         int i = 0;
         for (ModuleTier tier : ModuleTier.values()) {
@@ -81,7 +81,7 @@ public class ModContent {
             i++;
         }
         return items;
-    }
+    }*/
 
     private static void registerTieredModule(DeferredRegister<Item> registry, String name, BiFunction<String, ModuleTier, ModuleItem> item) {
         for (ModuleTier tier : ModuleTier.values()) {

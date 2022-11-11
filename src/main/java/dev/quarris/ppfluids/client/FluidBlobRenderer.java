@@ -16,8 +16,10 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.Mth;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.FluidState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.minecraftforge.fluids.FluidStack;
 
 import java.util.Random;
@@ -34,8 +36,10 @@ public class FluidBlobRenderer {
         float sizeOffset = (Mth.lerp(partialTicks, lastSizeOffset, thisSizeOffset));
         FluidStack fluidStack = item.getFluidContent();
         Fluid fluid = fluidStack.getFluid();
+        FluidState renderState = fluid.defaultFluidState();
+        IClientFluidTypeExtensions attributes = IClientFluidTypeExtensions.of(renderState);
         float size = Mth.lerp(Math.min(1, fluidStack.getAmount() / 2000f), 0.1f - sizeOffset, 0.25f + sizeOffset);
-        int color = fluid.getAttributes().getColor(fluidStack);
+        int color = attributes.getTintColor(renderState, Minecraft.getInstance().level, item.getCurrentPipe());
         float r = ((color >> 16) & 0xFF) / 255f; // red
         float g = ((color >> 8) & 0xFF) / 255f; // green
         float b = ((color >> 0) & 0xFF) / 255f; // blue
@@ -56,9 +60,10 @@ public class FluidBlobRenderer {
     }
 
     private static TextureAtlasSprite getFluidStillSprite(Fluid fluid) {
+        IClientFluidTypeExtensions attributes = IClientFluidTypeExtensions.of(fluid);
         return Minecraft.getInstance()
                 .getTextureAtlas(InventoryMenu.BLOCK_ATLAS)
-                .apply(fluid.getAttributes().getStillTexture());
+                .apply(attributes.getStillTexture());
     }
 
     public static class FluidBlobModel extends Model {

@@ -1,6 +1,5 @@
 package dev.quarris.ppfluids.pipe;
 
-import de.ellpeck.prettypipes.items.IModule;
 import de.ellpeck.prettypipes.network.PipeNetwork;
 import de.ellpeck.prettypipes.pipe.IPipeConnectable;
 import de.ellpeck.prettypipes.pipe.PipeBlockEntity;
@@ -15,8 +14,8 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.IItemHandler;
 import org.apache.commons.lang3.tuple.Pair;
@@ -47,7 +46,7 @@ public class FluidPipeBlockEntity extends PipeBlockEntity {
         }
 
         for (Direction dir : directions) {
-            IFluidHandler tank = this.getAdjacentFluidHandler(dir);
+            IFluidHandler tank = this.getFluidHandler(dir);
             if (tank == null)
                 continue;
 
@@ -107,7 +106,7 @@ public class FluidPipeBlockEntity extends PipeBlockEntity {
     @Override
     public boolean canHaveModules() {
         for(Direction dir : Direction.values()) {
-            if (this.getAdjacentFluidHandler(dir) != null) {
+            if (this.getFluidHandler(dir) != null) {
                 return true;
             }
 
@@ -125,7 +124,7 @@ public class FluidPipeBlockEntity extends PipeBlockEntity {
         return super.isConnected(dir); //this.getAdjacentFluidHandler(dir) != null;
     }
 
-    public IFluidHandler getAdjacentFluidHandler(Direction dir) {
+    public IFluidHandler getFluidHandler(Direction dir) {
         if (!this.isConnected(dir)) {
             return null;
         }
@@ -133,7 +132,7 @@ public class FluidPipeBlockEntity extends PipeBlockEntity {
         BlockPos pos = this.getBlockPos().relative(dir);
         BlockEntity tile = this.level.getBlockEntity(pos);
         if (tile != null) {
-            IFluidHandler handler = tile.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, dir.getOpposite()).orElse(null);
+            IFluidHandler handler = tile.getCapability(ForgeCapabilities.FLUID_HANDLER, dir.getOpposite()).orElse(null);
             if (handler != null) {
                 return handler;
             }
@@ -144,7 +143,7 @@ public class FluidPipeBlockEntity extends PipeBlockEntity {
 
     @Override
     public IItemHandler getItemHandler(Direction dir) {
-        IFluidHandler fluidHandler = this.getAdjacentFluidHandler(dir);
+        IFluidHandler fluidHandler = this.getFluidHandler(dir);
         if (fluidHandler != null) {
 
         }

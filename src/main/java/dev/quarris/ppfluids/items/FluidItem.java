@@ -3,7 +3,6 @@ package dev.quarris.ppfluids.items;
 import dev.quarris.ppfluids.ModContent;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -30,9 +29,9 @@ public class FluidItem extends ItemFluidContainer {
     @OnlyIn(Dist.CLIENT)
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
-        tooltip.add(new TranslatableComponent("info.ppfluids.fluid_item.usage"));
+        tooltip.add(Component.translatable("info.ppfluids.fluid_item.usage"));
         FluidStack fluidStack = getFluidCopyFromItem(stack);
-        tooltip.add(new TranslatableComponent(fluidStack.getTranslationKey())
+        tooltip.add(Component.translatable(fluidStack.getTranslationKey())
                 .append(": ").append(String.valueOf(fluidStack.getAmount())));
     }
 

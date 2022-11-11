@@ -1,13 +1,13 @@
 package dev.quarris.ppfluids.items;
 
 import de.ellpeck.prettypipes.items.IModule;
-import de.ellpeck.prettypipes.items.ModuleItem;
 import de.ellpeck.prettypipes.items.ModuleTier;
 import de.ellpeck.prettypipes.misc.DirectionSelector;
 import de.ellpeck.prettypipes.pipe.PipeBlockEntity;
 import de.ellpeck.prettypipes.pipe.containers.AbstractPipeContainer;
 import dev.quarris.ppfluids.ModContent;
 import dev.quarris.ppfluids.container.FluidFilterModuleContainer;
+import dev.quarris.ppfluids.misc.FluidDirectionSelector;
 import dev.quarris.ppfluids.misc.FluidFilter;
 import dev.quarris.ppfluids.pipe.FluidPipeBlockEntity;
 import net.minecraft.core.Direction;
@@ -15,7 +15,6 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.items.IItemHandler;
 
 public class FluidFilterModuleItem extends FluidModuleItem implements IFluidFilterProvider {
 
@@ -31,7 +30,7 @@ public class FluidFilterModuleItem extends FluidModuleItem implements IFluidFilt
     public boolean canAcceptItem(ItemStack module, PipeBlockEntity pipe, ItemStack stack, Direction dir, IFluidHandler destination) {
         if (!(pipe instanceof FluidPipeBlockEntity)) return false;
         FluidFilter filter = this.getFluidFilter(module, (FluidPipeBlockEntity) pipe);
-        return filter.isAllowed(stack);
+        return filter.isPipeItemAllowed(stack);
     }
 
     public boolean isCompatible(ItemStack module, PipeBlockEntity tile, IModule other) {
@@ -48,7 +47,7 @@ public class FluidFilterModuleItem extends FluidModuleItem implements IFluidFilt
 
     @Override
     public DirectionSelector getDirectionSelector(ItemStack module, PipeBlockEntity tile) {
-        return new DirectionSelector(module, tile);
+        return new FluidDirectionSelector(module, tile);
     }
 
     public FluidFilter getFluidFilter(ItemStack module, FluidPipeBlockEntity tile) {

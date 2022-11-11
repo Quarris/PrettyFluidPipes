@@ -81,7 +81,7 @@ public class FluidNetworkLocation extends NetworkLocation {
             PipeBlockEntity pipe = network.getPipe(this.pipePos);
             if (!(pipe instanceof FluidPipeBlockEntity))
                 throw new IllegalArgumentException(String.format("Pipe at %s is not a Fluid Pipe for a FluidNetworkLocation instance. Please report to PrettyPipesFluids issues.", this.pipePos));
-            this.handlerCache = ((FluidPipeBlockEntity) pipe).getAdjacentFluidHandler(this.direction);
+            this.handlerCache = ((FluidPipeBlockEntity) pipe).getFluidHandler(this.direction);
         }
         return this.handlerCache;
     }

@@ -1,13 +1,13 @@
 package dev.quarris.ppfluids.items;
 
 import de.ellpeck.prettypipes.items.IModule;
-import de.ellpeck.prettypipes.items.ModuleItem;
 import de.ellpeck.prettypipes.items.ModuleTier;
 import de.ellpeck.prettypipes.misc.DirectionSelector;
 import de.ellpeck.prettypipes.pipe.PipeBlockEntity;
 import de.ellpeck.prettypipes.pipe.containers.AbstractPipeContainer;
 import dev.quarris.ppfluids.ModContent;
 import dev.quarris.ppfluids.container.FluidExtractionModuleContainer;
+import dev.quarris.ppfluids.misc.FluidDirectionSelector;
 import dev.quarris.ppfluids.misc.FluidFilter;
 import dev.quarris.ppfluids.pipe.FluidPipeBlockEntity;
 import dev.quarris.ppfluids.pipenetwork.FluidPipeItem;
@@ -35,14 +35,14 @@ public class FluidExtractionModuleItem extends FluidModuleItem implements IFluid
     }
 
     @Override
-    public void tick(ItemStack module, PipeBlockEntity tile) {
-        if (!(tile instanceof FluidPipeBlockEntity fluidPipe) || !tile.shouldWorkNow(this.speed) || !tile.canWork())
+    public void tick(ItemStack module, PipeBlockEntity pipe) {
+        if (!(pipe instanceof FluidPipeBlockEntity fluidPipe) || !pipe.shouldWorkNow(this.speed) || !pipe.canWork())
             return;
 
-        FluidFilter filter = new FluidFilter(this.filterSlots, module, fluidPipe);
-
-        for (Direction dir : Direction.values()) {
-            IFluidHandler tank = fluidPipe.getAdjacentFluidHandler(dir);
+        FluidFilter filter = this.getFluidFilter(module, fluidPipe);
+        DirectionSelector dirSelector = this.getDirectionSelector(module, fluidPipe);
+        for (Direction dir : dirSelector.directions()) {
+            IFluidHandler tank = fluidPipe.getFluidHandler(dir);
             if (tank == null)
                 continue;
 
@@ -50,7 +50,7 @@ public class FluidExtractionModuleItem extends FluidModuleItem implements IFluid
             if (fluid.isEmpty())
                 continue;
 
-            if (!filter.isAllowed(fluid))
+            if (!filter.isPipeFluidAllowed(fluid))
                 continue;
 
             FluidStack remain = PipeNetworkUtil.routeFluid(fluidPipe.getLevel(), fluidPipe.getBlockPos(), fluidPipe.getBlockPos().relative(dir), fluid, FluidPipeItem::new, this.preventOversending);
@@ -63,18 +63,18 @@ public class FluidExtractionModuleItem extends FluidModuleItem implements IFluid
     }
 
     @Override
-    public boolean isCompatible(ItemStack itemStack, PipeBlockEntity tile, IModule iModule) {
-        return tile instanceof FluidPipeBlockEntity && !(iModule instanceof FluidExtractionModuleItem);
-    }
-
-    @Override
     public boolean canNetworkSee(ItemStack module, PipeBlockEntity pipe, Direction dir, IFluidHandler destination) {
-        return false;
+        return !this.getDirectionSelector(module, pipe).has(dir);
     }
 
     @Override
     public boolean canAcceptItem(ItemStack module, PipeBlockEntity pipe, ItemStack stack, Direction dir, IFluidHandler destination) {
-        return false;
+        return !this.getDirectionSelector(module, pipe).has(dir);
+    }
+
+    @Override
+    public boolean isCompatible(ItemStack itemStack, PipeBlockEntity tile, IModule iModule) {
+        return tile instanceof FluidPipeBlockEntity && !(iModule instanceof FluidExtractionModuleItem);
     }
 
     public boolean hasContainer(ItemStack module, PipeBlockEntity tile) {
@@ -85,12 +85,12 @@ public class FluidExtractionModuleItem extends FluidModuleItem implements IFluid
         return new FluidExtractionModuleContainer(ModContent.FLUID_EXTRACTION_CONTAINER.get(), windowId, player, tile.getBlockPos(), moduleIndex);
     }
 
-    @Override
-    public DirectionSelector getDirectionSelector(ItemStack module, PipeBlockEntity tile) {
-        return new DirectionSelector(module, tile);
-    }
-
     public FluidFilter getFluidFilter(ItemStack module, FluidPipeBlockEntity tile) {
         return new FluidFilter(this.filterSlots, module, tile);
+    }
+
+    @Override
+    public DirectionSelector getDirectionSelector(ItemStack module, PipeBlockEntity tile) {
+        return new FluidDirectionSelector(module, tile);
     }
 }

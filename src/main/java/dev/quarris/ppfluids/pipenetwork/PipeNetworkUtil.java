@@ -120,7 +120,7 @@ public class PipeNetworkUtil {
                 continue;
 
             for (Direction dir : Direction.values()) {
-                IFluidHandler handler = pipe.getAdjacentFluidHandler(dir);
+                IFluidHandler handler = pipe.getFluidHandler(dir);
                 if (handler == null)
                     continue;
 
