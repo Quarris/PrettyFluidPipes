@@ -100,7 +100,7 @@ public class FluidPipeItem extends PipeItem {
             if (connectable != null) {
                 return connectable.insertItem(currFluidPipe.getBlockPos(), dir, this.stack, false);
             } else {
-                IFluidHandler handler = currFluidPipe.getAdjacentFluidHandler(dir);
+                IFluidHandler handler = currFluidPipe.getFluidHandler(dir);
                 if (handler == null)
                     return this.stack;
 

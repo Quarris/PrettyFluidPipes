@@ -1,23 +1,34 @@
 buildscript {
     repositories {
-        maven { url = 'https://maven.minecraftforge.net' }
-        jcenter()
         mavenCentral()
+        maven {
+            name "Sponge"
+            url "https://repo.spongepowered.org/repository/maven-public/"
+            content { includeGroup "org.spongepowered" }
+        }
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
+        classpath group: 'org.spongepowered', name: 'mixingradle', version: '0.7-SNAPSHOT'
     }
 }
-apply plugin: 'net.minecraftforge.gradle'
-// Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
-apply plugin: 'eclipse'
-apply plugin: 'maven-publish'
+plugins {
+    id 'eclipse'
+    id 'maven-publish'
+    id 'net.minecraftforge.gradle' version '5.1.+'
+}
+
+apply plugin: 'org.spongepowered.mixin'
 
 version = "${mc_version}-${mod_version}"
 group = 'dev.quarris.ppfluids' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'PrettyPipesFluids'
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+mixin {
+    add sourceSets.main, "ppfluids.refmap.json"
+    config "ppfluids.mixins.json"
+}
 
 minecraft {
     // The mappings can be changed at any time, and must be in the following format.
@@ -41,6 +52,8 @@ minecraft {
 
             // Recommended logging level for the console
             property 'forge.logging.console.level', 'info'
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
 
             mods {
                 ppfluids {
@@ -57,6 +70,8 @@ minecraft {
 
             // Recommended logging level for the console
             property 'forge.logging.console.level', 'info'
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
 
             mods {
                 ppfluids {
@@ -73,6 +88,8 @@ minecraft {
 
             // Recommended logging level for the console
             property 'forge.logging.console.level', 'info'
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
 
             args '--mod', 'ppfluids', '--all', '--output', file('src/generated/resources/')
 
@@ -103,10 +120,14 @@ repositories {
 }
 
 dependencies {
+    if (System.getProperty("idea.sync.active") != "true") {
+        annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+    }
     minecraft "net.minecraftforge:forge:${mc_version}-${forge_version}"
-    runtimeOnly fg.deobf('curse.maven:ITank-256991:3697465')
+    runtimeOnly fg.deobf("curse.maven:ITank-256991:${itank_curse_version}")
     implementation fg.deobf("curse.maven:PrettyPipes-376737:${pp_curse_version}")
-    runtimeOnly fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}")
+    runtimeOnly fg.deobf("mezz.jei:jei-${mc_version}-forge:${jei_version}")
+    compileOnly fg.deobf("mezz.jei:jei-${mc_version}-forge-api:${jei_version}")
     //runtimeOnly fg.deobf('curse.maven:Jei-238222:3681294')
     //implementation fg.deobf("de.ellpeck.prettypipes:PrettyPipes:${pp_version}")
 
@@ -144,4 +165,8 @@ publishing {
             url "file:///${project.projectDir}/mcmodsrepo"
         }
     }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
 }

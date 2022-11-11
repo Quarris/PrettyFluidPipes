@@ -7,6 +7,7 @@ import de.ellpeck.prettypipes.pipe.PipeBlockEntity;
 import de.ellpeck.prettypipes.pipe.containers.AbstractPipeContainer;
 import dev.quarris.ppfluids.ModContent;
 import dev.quarris.ppfluids.container.FluidRetrievalModuleContainer;
+import dev.quarris.ppfluids.misc.FluidDirectionSelector;
 import dev.quarris.ppfluids.misc.FluidFilter;
 import dev.quarris.ppfluids.pipe.FluidPipeBlockEntity;
 import dev.quarris.ppfluids.pipenetwork.PipeNetworkUtil;
@@ -17,8 +18,11 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import org.apache.commons.lang3.tuple.Pair;
+
+import java.util.Optional;
 
 public class FluidRetrievalModuleItem extends FluidModuleItem implements IFluidFilterProvider {
 
@@ -35,27 +39,34 @@ public class FluidRetrievalModuleItem extends FluidModuleItem implements IFluidF
         this.preventOversending = tier.forTier(true, true, true);
     }
 
+    @Override
     public void tick(ItemStack module, PipeBlockEntity tile) {
-        if (tile instanceof FluidPipeBlockEntity && tile.shouldWorkNow(this.speed) && tile.canWork()) {
-            FluidPipeBlockEntity pipe = (FluidPipeBlockEntity) tile;
-            Direction[] directions = this.getDirectionSelector(module, tile).directions();
+        if (!(tile instanceof FluidPipeBlockEntity fluidPipe) || !tile.shouldWorkNow(this.speed) || !tile.canWork())
+            return;
 
-            for (FluidFilter filter : pipe.getFluidFilters()) {
-                for (int slot = 0; slot < filter.getSlots(); ++slot) {
-                    FluidStack filtered = filter.getFilter(slot);
-                    if (filtered.isEmpty())
-                        continue;
-                    var copy = filtered.copy();
-                    copy.setAmount(this.maxExtraction);
-                    Pair<BlockPos, ItemStack> dest = pipe.getAvailableDestination(directions, copy, true, this.preventOversending);
-                    if (dest == null)
-                        continue;
-                    ItemStack fluidItem = dest.getRight().copy();
-                    //remain.shrink(network.getCurrentlyCraftingAmount(pipe.getPos(), copy, equalityTypes));
-                    // Try and request fluid instead of item
-                    if (PipeNetworkUtil.requestFluid(pipe.getLevel(), pipe.getBlockPos(), dest.getLeft(), FluidItem.getFluidCopyFromItem(fluidItem)).isEmpty()) {
-                        break;
-                    }
+        Direction[] directions = this.getDirectionSelector(module, tile).directions();
+
+        for (FluidFilter subFilter : fluidPipe.getFluidFilters()) {
+            for (int slot = 0; slot < subFilter.getSlots(); slot++) {
+                ItemStack filteredBucket = subFilter.getStackInSlot(slot);
+                if (filteredBucket.isEmpty())
+                    continue;
+
+                Optional<FluidStack> filtered = FluidUtil.getFluidContained(filteredBucket);
+
+                if (!filtered.isPresent())
+                    continue;
+
+                FluidStack copy = filtered.get().copy();
+                copy.setAmount(this.maxExtraction);
+                Pair<BlockPos, ItemStack> dest = fluidPipe.getAvailableDestination(directions, copy, true, this.preventOversending);
+                if (dest == null)
+                    continue;
+                ItemStack fluidItem = dest.getRight().copy();
+                //remain.shrink(network.getCurrentlyCraftingAmount(pipe.getPos(), copy, equalityTypes));
+                // Try and request fluid instead of item
+                if (PipeNetworkUtil.requestFluid(fluidPipe.getLevel(), fluidPipe.getBlockPos(), dest.getLeft(), FluidItem.getFluidCopyFromItem(fluidItem)).isEmpty()) {
+                    break;
                 }
             }
         }
@@ -64,7 +75,7 @@ public class FluidRetrievalModuleItem extends FluidModuleItem implements IFluidF
     private FluidStack requestFilteredFromNetwork(Level level, BlockPos pos, FluidFilter filter) {
         for (var location : PipeNetworkUtil.getOrderedNetworkFluids(level, pos)) {
             var fluid = location.getFirstAvailableFluid(level);
-            if (filter.isAllowed(fluid)) {
+            if (filter.isPipeFluidAllowed(fluid)) {
                 return fluid;
             }
         }
@@ -95,7 +106,7 @@ public class FluidRetrievalModuleItem extends FluidModuleItem implements IFluidF
 
     @Override
     public DirectionSelector getDirectionSelector(ItemStack module, PipeBlockEntity tile) {
-        return new DirectionSelector(module, tile);
+        return new FluidDirectionSelector(module, tile);
     }
 
     @Override

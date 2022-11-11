@@ -19,7 +19,7 @@ public final class PacketHandler {
     );
 
     public static void init() {
-        channel.registerMessage(0, ButtonPacket.class, ButtonPacket::encode, ButtonPacket::decode, ButtonPacket::handle);
+        channel.registerMessage(0, FluidButtonPacket.class, FluidButtonPacket::encode, FluidButtonPacket::decode, FluidButtonPacket::handle);
     }
 
     public static void sendToAllLoaded(Level level, BlockPos pos, Object message) {

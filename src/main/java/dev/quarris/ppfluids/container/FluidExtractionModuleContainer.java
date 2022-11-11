@@ -27,22 +27,24 @@ public class FluidExtractionModuleContainer extends AbstractPipeContainer<FluidE
     protected void addSlots() {
         this.filter = this.module.getFluidFilter(this.moduleStack, (FluidPipeBlockEntity) this.tile);
         this.directionSelector = this.module.getDirectionSelector(this.moduleStack, this.tile);
-        List<Slot> filterSlots = this.filter.createContainerSlots((176 - Math.min(this.module.filterSlots, 9) * 18) / 2 + 1, 49);
-        for (Slot slot : filterSlots) {
+        for (Slot slot : this.filter.createSlots((176 - this.module.filterSlots * 18) / 2 + 1, 17 + 32)) {
             this.addSlot(slot);
         }
     }
 
-    public void removed(Player playerIn) {
-        super.removed(playerIn);
-        this.filter.save();
+    @Override
+    public void clicked(int slotId, int dragType, ClickType clickTypeIn, Player player) {
+        if (FluidFilterSlot.clickFilter(this, slotId, player))
+            return;
+
+        super.clicked(slotId, dragType, clickTypeIn, player);
     }
 
     @Override
-    public void clicked(int slotId, int dragType, ClickType clickTypeIn, Player player) {
-        if (!FluidFilterSlot.isFilterSlot(this, slotId, player)) {
-            super.clicked(slotId, dragType, clickTypeIn, player);
-        }
+    public void removed(Player playerIn) {
+        super.removed(playerIn);
+        this.filter.save();
+        this.directionSelector.save();
     }
 
     @Override
