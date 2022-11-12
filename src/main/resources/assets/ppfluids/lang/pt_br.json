@@ -1,0 +1,20 @@
+{
+    "block.ppfluids.fluid_pipe": "Tubo de Fluido",
+    "item.ppfluids.fluid_item": "Recipiente de fluido",
+
+    "item.ppfluids.low_fluid_extraction_module": "Módulo de extração de baixo fluido",
+    "item.ppfluids.medium_fluid_extraction_module": "Módulo de extração de fluido médio",
+    "item.ppfluids.high_fluid_extraction_module": "Módulo de extração de alto fluido",
+    "item.ppfluids.low_fluid_filter_module": "Módulo de filtro de baixo fluido",
+    "item.ppfluids.medium_fluid_filter_module": "Módulo de filtro de fluido médio",
+    "item.ppfluids.high_fluid_filter_module": "Módulo de filtro de alto fluido",
+    "item.ppfluids.low_fluid_retrieval_module": "Módulo de baixa recuperação de fluido",
+    "item.ppfluids.medium_fluid_retrieval_module": "Módulo de recuperação de fluido médio",
+    "item.ppfluids.high_fluid_retrieval_module": "Módulo de alta recuperação de fluido",
+    "info.prettypipes.fluid_extraction_module": "Puxa fluido de estoques adjacentes\nOs filtros e as taxas de pull variam de acordo com o nível\nNíveis altos impedem o envio excessivo",
+
+    "info.prettypipes.fluid_filter_module": "Restringe o fluxo de tubos para tanques adjacentes\nO valor do filtro varia de acordo com o nível",
+    "info.prettypipes.fluid_retrieval_module": "Puxa fluido de outros tanques na rede\nOs filtros e as taxas de pull variam de acordo com o nível\nNíveis altos impedem o envio excessivo",
+
+    "info.ppfluids.fluid_item.usage": "Use-me em um tanque de fluido para inserir meu conteúdo nele!"
+}
