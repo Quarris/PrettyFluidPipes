@@ -15,6 +15,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -152,6 +153,28 @@ public class FluidFilter extends ItemFilter {
             }
         }
         return false;
+    }
+
+    @Override
+    public void deserializeNBT(CompoundTag nbt) {
+        // Deprecated deserialization
+        if (nbt.contains("fluids")) {
+            ListTag fluidList = nbt.getList("fluids", CompoundTag.TAG_COMPOUND);
+            int size = Math.min(fluidList.size(), this.getSlots());
+            for (int i = 0; i < size; i++) {
+                CompoundTag fluidNBT = fluidList.getCompound(i);
+                FluidStack fluid = FluidStack.loadFluidStackFromNBT(fluidNBT);
+                this.setStackInSlot(i, FluidUtil.getFilledBucket(fluid));
+            }
+            if (this.canModifyWhitelist) {
+                this.isWhitelist = nbt.getBoolean("whitelist");
+            }
+            ((ItemFilterAccessor) this).setModified(true);
+            return;
+        }
+
+        super.deserializeNBT(nbt);
+
     }
 
     public interface IFluidFilteredContainer extends IFilteredContainer {
