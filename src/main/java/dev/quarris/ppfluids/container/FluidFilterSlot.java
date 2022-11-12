@@ -12,13 +12,11 @@ import net.minecraftforge.items.SlotItemHandler;
 
 public class FluidFilterSlot extends SlotItemHandler {
 
-    //private final FluidFilter filter;
     private final int index;
 
     public FluidFilterSlot(IItemHandler handler, int index, int xPosition, int yPosition) {
         super(handler, index, xPosition, yPosition);
         this.index = index;
-        //this.filter = handler;
     }
 
     public static boolean clickFilter(AbstractContainerMenu container, int slotId, Player player) {
@@ -37,24 +35,19 @@ public class FluidFilterSlot extends SlotItemHandler {
         ItemStack heldStack = menu.getCarried();
         ItemStack stackInSlot = this.getItem();
         if (!stackInSlot.isEmpty() && heldStack.isEmpty()) {
-            this.putFluidStack(FluidStack.EMPTY);
+            this.set(ItemStack.EMPTY);
         } else if (!heldStack.isEmpty()) {
             FluidStack fluid = FluidUtil.getFluidContained(heldStack).orElse(FluidStack.EMPTY).copy();
             if (!fluid.isEmpty()) {
-                fluid.setAmount(1);
-                this.putFluidStack(fluid);
+                ItemStack bucket = FluidUtil.getFilledBucket(fluid);
+                this.set(bucket);
             }
         }
     }
 
-    public void putFluidStack(FluidStack stack) {
-        //this.filter.setFilter(this.index, stack);
-        this.setChanged();
-    }
-
     @Override
     public void setChanged() {
-        //this.filter.setModified(true);
+        super.setChanged();
     }
 
     @Override

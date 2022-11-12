@@ -10,6 +10,7 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -25,13 +26,13 @@ public class FluidDirectionSelector extends DirectionSelector {
     @OnlyIn(Dist.CLIENT)
     public AbstractWidget getButton(int x, int y) {
         DirectionSelectorAccessor accessor = (DirectionSelectorAccessor) this;
-        return new ExtendedButton(x, y, 100, 20, Component.translatable("info." + PrettyPipes.ID + ".populate"), button ->
+        return new ExtendedButton(x, y, 100, 20, new TranslatableComponent("info." + PrettyPipes.ID + ".populate"), button ->
             PacketButton.sendAndExecute(accessor.getPipe().getBlockPos(), PacketButton.ButtonResult.DIRECTION_SELECTOR)) {
             @Override
             public Component getMessage() {
                 PipeBlockEntity pipe = accessor.getPipe();
                 Direction dir = accessor.getDirection();
-                MutableComponent msg = Component.translatable("dir." + PrettyPipes.ID + "." + (dir != null ? dir.getName() : "all"));
+                MutableComponent msg = new TranslatableComponent("dir." + PrettyPipes.ID + "." + (dir != null ? dir.getName() : "all"));
                 if (dir != null && pipe instanceof FluidPipeBlockEntity fluidPipe) {
                     MutableComponent blockName = fluidPipe.getFluidHandler(dir) != null ? pipe.getLevel().getBlockState(pipe.getBlockPos().relative(dir)).getBlock().getName() : null;
                     if (blockName != null)

@@ -3,6 +3,7 @@ package dev.quarris.ppfluids.items;
 import dev.quarris.ppfluids.ModContent;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -29,15 +30,15 @@ public class FluidItem extends ItemFluidContainer {
     @OnlyIn(Dist.CLIENT)
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
-        tooltip.add(Component.translatable("info.ppfluids.fluid_item.usage"));
+        tooltip.add(new TranslatableComponent("info.ppfluids.fluid_item.usage"));
         FluidStack fluidStack = getFluidCopyFromItem(stack);
-        tooltip.add(Component.translatable(fluidStack.getTranslationKey())
+        tooltip.add(new TranslatableComponent(fluidStack.getTranslationKey())
                 .append(": ").append(String.valueOf(fluidStack.getAmount())));
     }
 
     public static ItemStack createItemFromFluid(FluidStack fluid, boolean simulate) {
         ItemStack item =  new ItemStack(ModContent.FLUID_ITEM.get());
-        int filled = FluidUtil.getFluidHandler(item).map(tank -> tank.fill(fluid, IFluidHandler.FluidAction.EXECUTE)).orElse(0);
+        int filled = FluidUtil.getFluidHandler(item).map(tank -> tank.fill(fluid, simulate ? IFluidHandler.FluidAction.SIMULATE : IFluidHandler.FluidAction.EXECUTE)).orElse(0);
         if (!simulate)
             fluid.grow(filled);
         return item;

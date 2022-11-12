@@ -27,7 +27,7 @@ public class FluidRetrievalModuleContainer extends AbstractPipeContainer<FluidRe
     protected void addSlots() {
         this.filter = this.module.getFluidFilter(this.moduleStack, (FluidPipeBlockEntity) this.tile);
         this.directionSelector = this.module.getDirectionSelector(this.moduleStack, this.tile);
-        List<Slot> filterSlots = this.filter.createSlots((176 - this.module.filterSlots * 18) / 2 + 1, 49);
+        List<Slot> filterSlots = this.filter.getSlots((176 - this.module.filterSlots * 18) / 2 + 1, 49);
         for (Slot slot : filterSlots) {
             this.addSlot(slot);
         }

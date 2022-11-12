@@ -18,7 +18,7 @@ public class FluidRetrievalModuleScreen extends AbstractPipeGui<FluidRetrievalMo
     @Override
     protected void init() {
         super.init();
-        for (AbstractWidget button : this.menu.getFilter().createButtons(this, this.leftPos + this.imageWidth - 7, this.topPos + 17 + 32 + 20)) {
+        for (AbstractWidget button : this.menu.getFilter().getButtons(this, this.leftPos + this.imageWidth - 7, this.topPos + 17 + 32 + 20, false)) {
             this.addRenderableWidget(button);
         }
 

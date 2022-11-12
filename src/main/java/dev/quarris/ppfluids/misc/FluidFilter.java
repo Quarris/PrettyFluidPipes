@@ -2,9 +2,12 @@ package dev.quarris.ppfluids.misc;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import de.ellpeck.prettypipes.PrettyPipes;
+import de.ellpeck.prettypipes.misc.ItemFilter;
 import de.ellpeck.prettypipes.packets.PacketButton;
+import de.ellpeck.prettypipes.pipe.PipeBlockEntity;
 import dev.quarris.ppfluids.ModContent;
 import dev.quarris.ppfluids.container.FluidFilterSlot;
+import dev.quarris.ppfluids.mixins.ItemFilterAccessor;
 import dev.quarris.ppfluids.pipe.FluidPipeBlockEntity;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -13,6 +16,8 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
@@ -28,23 +33,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-public class FluidFilter extends ItemStackHandler {
+public class FluidFilter extends ItemFilter {
 
-    protected ItemStack moduleItem;
     protected FluidPipeBlockEntity pipe;
-    public boolean isWhitelist;
-    //protected NonNullList<FluidStack> filters;
 
-    public boolean canPopulateFromTanks;
-    public boolean canModifyWhitelist = true;
-    private boolean modified;
-
-    public FluidFilter(int size, ItemStack moduleItem, FluidPipeBlockEntity pipe, boolean isDefaultWhitelist) {
-        super(size);
-        this.pipe = pipe;
-        this.moduleItem = moduleItem;
+    public FluidFilter(int size, ItemStack moduleItem, PipeBlockEntity pipe, boolean isDefaultWhitelist) {
+        super(size, moduleItem, pipe);
+        this.pipe = (FluidPipeBlockEntity) pipe;
         this.isWhitelist = isDefaultWhitelist;
-        //this.filters = NonNullList.withSize(size, FluidStack.EMPTY);
         this.load();
     }
 
@@ -52,7 +48,8 @@ public class FluidFilter extends ItemStackHandler {
         this(size, moduleItem, pipe, false);
     }
 
-    public List<Slot> createSlots(int x, int y) {
+    @Override
+    public List<Slot> getSlots(int x, int y) {
         List<Slot> slots = new ArrayList<>();
         for (int i = 0; i < this.getSlots(); ++i) {
             slots.add(new FluidFilterSlot(this, i, x + i % 9 * 18, y + i / 9 * 18));
@@ -60,27 +57,28 @@ public class FluidFilter extends ItemStackHandler {
         return slots;
     }
 
+    @Override
     @OnlyIn(Dist.CLIENT)
-    public List<AbstractWidget> createButtons(final Screen gui, int x, int y) {
+    public List<AbstractWidget> getButtons(Screen gui, int x, int y, boolean rightAligned) {
         List<AbstractWidget> buttons = new ArrayList<>();
         if (this.canModifyWhitelist) {  // Allowed/Disallowed button
-            Supplier<Component> whitelistText = () -> Component.translatable("info.prettypipes." + (this.isWhitelist ? "whitelist" : "blacklist"));
+            Supplier<MutableComponent> whitelistText = () -> new TranslatableComponent("info.prettypipes." + (this.isWhitelist ? "whitelist" : "blacklist"));
             buttons.add(new Button(x - 20, y, 20, 20, whitelistText.get(), button -> {
                 PacketButton.sendAndExecute(this.pipe.getBlockPos(), PacketButton.ButtonResult.FILTER_CHANGE, 0);
                 button.setMessage(whitelistText.get());
             }) {
                 @Override
                 public void renderToolTip(PoseStack matrix, int x, int y) {
-                    gui.renderTooltip(matrix, Component.translatable(whitelistText.get() + ".description").withStyle(ChatFormatting.GRAY), x, y);
+                    gui.renderTooltip(matrix, new TranslatableComponent("info.ppfluids." + (FluidFilter.this.isWhitelist ? "whitelist" : "blacklist") + ".description").withStyle(ChatFormatting.GRAY), x, y);
                 }
             });
         }
 
-        if (this.canPopulateFromTanks) { // Populate button
-            buttons.add(new Button(x - 42, y, 20, 20, Component.translatable("info." + PrettyPipes.ID + ".populate"), button -> PacketButton.sendAndExecute(this.pipe.getBlockPos(), PacketButton.ButtonResult.FILTER_CHANGE, 1)) {
+        if (this.canPopulateFromInventories) { // Populate button
+            buttons.add(new Button(x - 42, y, 20, 20, new TranslatableComponent("info." + PrettyPipes.ID + ".populate"), button -> PacketButton.sendAndExecute(this.pipe.getBlockPos(), PacketButton.ButtonResult.FILTER_CHANGE, 1)) {
                 @Override
                 public void renderToolTip(PoseStack matrix, int x, int y) {
-                    gui.renderTooltip(matrix, Component.translatable("info." + PrettyPipes.ID + ".populate.description").withStyle(ChatFormatting.GRAY), x, y);
+                    gui.renderTooltip(matrix, new TranslatableComponent("info." + PrettyPipes.ID + ".populate.description").withStyle(ChatFormatting.GRAY), x, y);
                 }
             });
         }
@@ -88,12 +86,14 @@ public class FluidFilter extends ItemStackHandler {
         return buttons;
     }
 
-    public void onButtonPacket(IFluidFilteredContainer menu, int id) {
+    @Override
+    public void onButtonPacket(IFilteredContainer menu, int id) {
         if (id == 0 && this.canModifyWhitelist) {
+            ItemFilterAccessor accessor = (ItemFilterAccessor) this;
             this.isWhitelist = !this.isWhitelist;
-            this.modified = true;
+            accessor.setModified(true);
             this.save();
-        } else if (id == 1 && this.canPopulateFromTanks) {
+        } else if (id == 1 && this.canPopulateFromInventories) {
             List<FluidFilter> filters = this.pipe.getFluidFilters();
             boolean changed = false;
             for (Direction dir : Direction.values()) {
@@ -154,56 +154,7 @@ public class FluidFilter extends ItemStackHandler {
         return false;
     }
 
-    /*public void setFilter(int slot, FluidStack filter) {
-        this.filters.set(slot, filter == null ? FluidStack.EMPTY : filter);
-        this.setStackInSlot(slot, filter == null ? ItemStack.EMPTY : FluidUtil.getFilledBucket(filter));
-        this.modified = true;
-    }*/
-
-    /*public FluidStack getFilter(int slot) {
-        return this.filters.get(slot);
-    }*/
-
-    /*public int size() {
-        return this.filters.size();
-    }*/
-
-    public void save() {
-        if (this.modified) {
-            this.moduleItem.getOrCreateTag().put("filter", this.serializeNBT());
-            this.modified = false;
-        }
-    }
-
-    public void load() {
-        if (this.moduleItem.hasTag() && this.moduleItem.getTag().contains("filter")) {
-            this.deserializeNBT(this.moduleItem.getTag().getCompound("filter"));
-        }
-    }
-
-    @Override
-    public CompoundTag serializeNBT() {
-        CompoundTag nbt = super.serializeNBT();
-        if (this.canModifyWhitelist) {
-            nbt.putBoolean("whitelist", this.isWhitelist);
-        }
-
-        return nbt;
-    }
-
-    @Override
-    public void deserializeNBT(CompoundTag nbt) {
-        super.deserializeNBT(nbt);
-        if (this.canModifyWhitelist) {
-            this.isWhitelist = nbt.getBoolean("whitelist");
-        }
-    }
-
-    /*public void setModified(boolean modified) {
-        this.modified = modified;
-    }*/
-
-    public interface IFluidFilteredContainer {
+    public interface IFluidFilteredContainer extends IFilteredContainer {
         FluidFilter getFilter();
 
         default void onFilterPopulated() {

@@ -14,8 +14,8 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.IItemHandler;
 import org.apache.commons.lang3.tuple.Pair;
@@ -51,7 +51,7 @@ public class FluidPipeBlockEntity extends PipeBlockEntity {
                 continue;
 
             if (!force && this.streamModules().filter(m -> m.getRight() instanceof IFluidModule)
-                .anyMatch(m -> !((IFluidModule) m.getRight()).canAcceptItem(m.getLeft(), this, FluidItem.createItemFromFluid(fluid, false), dir, tank))) {
+                .anyMatch(m -> !((IFluidModule) m.getRight()).canAcceptItem(m.getLeft(), this, FluidItem.createItemFromFluid(fluid, true), dir, tank))) {
                 continue;
             }
             int amountFilled = tank.fill(fluid, IFluidHandler.FluidAction.SIMULATE);
@@ -79,8 +79,8 @@ public class FluidPipeBlockEntity extends PipeBlockEntity {
                         FluidStack copy = toInsert.copy();
                         copy.setAmount(Integer.MAX_VALUE);
                         int availableSpace = tank.fill(copy, IFluidHandler.FluidAction.SIMULATE);
-                        if (onTheWay + toInsert.getAmount() > availableSpace) {
-                            toInsert.setAmount(availableSpace - onTheWay);
+                        if (onTheWay + toInsert.getAmount() > amountFilled) {
+                            toInsert.setAmount(amountFilled - onTheWay);
                         }
                     }
                 }
@@ -132,7 +132,7 @@ public class FluidPipeBlockEntity extends PipeBlockEntity {
         BlockPos pos = this.getBlockPos().relative(dir);
         BlockEntity tile = this.level.getBlockEntity(pos);
         if (tile != null) {
-            IFluidHandler handler = tile.getCapability(ForgeCapabilities.FLUID_HANDLER, dir.getOpposite()).orElse(null);
+            IFluidHandler handler = tile.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, dir.getOpposite()).orElse(null);
             if (handler != null) {
                 return handler;
             }

@@ -52,7 +52,7 @@ public class FluidFilterModuleItem extends FluidModuleItem implements IFluidFilt
 
     public FluidFilter getFluidFilter(ItemStack module, FluidPipeBlockEntity tile) {
         FluidFilter filter = new FluidFilter(this.filterSlots, module, tile);
-        filter.canPopulateFromTanks = this.canPopulateFromTanks;
+        filter.canPopulateFromInventories = this.canPopulateFromTanks;
         return filter;
     }
 }

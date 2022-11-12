@@ -6,7 +6,8 @@
   "refmap": "enigmaticgraves.refmap.json",
   "mixins": [
     "DirectionSelectorAccessor",
-    "DirectionSelectorMixin"
+    "DirectionSelectorMixin",
+    "ItemFilterAccessor"
   ],
   "injectors": {
     "defaultRequire": 1
