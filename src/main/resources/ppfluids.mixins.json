@@ -3,10 +3,10 @@
   "minVersion": "0.8",
   "compatibilityLevel": "JAVA_17",
   "package": "dev.quarris.ppfluids.mixins",
-  "refmap": "enigmaticgraves.refmap.json",
+  "refmap": "ppfluids.refmap.json",
   "mixins": [
-    "DirectionSelectorAccessor",
-    "DirectionSelectorMixin"
+    "PipeBlockEntityMixin",
+    "PipeBlockMixin"
   ],
   "injectors": {
     "defaultRequire": 1
