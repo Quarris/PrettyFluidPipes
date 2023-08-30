@@ -56,6 +56,8 @@ minecraft {
     }
 }
 
+sourceSets.main.resources { srcDir 'src/generated/resources' }
+
 repositories {
     maven {
         name = "PrettyPipes"
@@ -80,7 +82,7 @@ dependencies {
     minecraft "net.minecraftforge:forge:${mc_version}-${forge_version}"
 
     minecraftLibrary "org.jgrapht:jgrapht-core:${jgt_version}"
-    implementation fg.deobf("de.ellpeck.prettypipes:PrettyPipes:${pp_version}")
+    implementation fg.deobf("de.ellpeck.prettypipes:PrettyPipes:${pp_version}") { transitive = true }
 
     runtimeOnly fg.deobf("curse.maven:ITank-256991:${itank_curse_version}")
     runtimeOnly fg.deobf("mezz.jei:jei-${mc_version}-forge:${jei_version}")
