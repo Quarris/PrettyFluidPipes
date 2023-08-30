@@ -5,8 +5,8 @@
   "package": "dev.quarris.ppfluids.mixins",
   "refmap": "ppfluids.refmap.json",
   "mixins": [
-    "PipeBlockEntityMixin",
-    "PipeBlockMixin"
+    "DirectionSelectorAccessor",
+    "DirectionSelectorMixin"
   ],
   "injectors": {
     "defaultRequire": 1
