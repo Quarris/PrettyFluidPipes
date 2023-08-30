@@ -13,7 +13,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import org.jetbrains.annotations.Nullable;
 
 public class FluidPipeBlock extends PipeBlock {
@@ -43,7 +43,7 @@ public class FluidPipeBlock extends PipeBlock {
             if (connectable != null)
                 return connectable.getConnectionType(pos, direction);
 
-            if (tile.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, opposite).isPresent()) {
+            if (tile.getCapability(ForgeCapabilities.FLUID_HANDLER, opposite).isPresent()) {
                 return ConnectionType.CONNECTED;
             }
         }

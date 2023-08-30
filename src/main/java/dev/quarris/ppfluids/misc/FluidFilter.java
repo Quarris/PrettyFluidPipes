@@ -10,6 +10,7 @@ import dev.quarris.ppfluids.registry.ItemSetup;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -64,24 +65,21 @@ public class FluidFilter extends ItemStackHandler {
         List<AbstractWidget> buttons = new ArrayList<>();
         if (this.canModifyWhitelist) {  // Allowed/Disallowed button
             Supplier<String> whitelistText = () -> "info." + PrettyPipes.ID + "." + (this.isWhitelist ? "whitelist" : "blacklist");
-            buttons.add(new Button(x - 20, y, 20, 20, Component.translatable(whitelistText.get()), button -> {
-                FluidButtonPacket.sendAndExecute(this.pipe.getBlockPos(), FluidButtonPacket.ButtonResult.FILTER_CHANGE, 0);
-                button.setMessage(Component.translatable(whitelistText.get()));
-            }) {
-                @Override
-                public void renderToolTip(PoseStack matrix, int x, int y) {
-                    gui.renderTooltip(matrix, Component.translatable(whitelistText.get() + ".description").withStyle(ChatFormatting.GRAY), x, y);
-                }
-            });
+            buttons.add(Button.builder(Component.translatable(whitelistText.get()), button -> {
+                    FluidButtonPacket.sendAndExecute(this.pipe.getBlockPos(), FluidButtonPacket.ButtonResult.FILTER_CHANGE, 0);
+                    button.setMessage(Component.translatable(whitelistText.get()));
+                })
+                .bounds(x - 20, y, 20, 20)
+                .tooltip(Tooltip.create(Component.translatable(whitelistText.get() + ".description").withStyle(ChatFormatting.GRAY)))
+                .build());
         }
 
         if (this.canPopulateFromTanks) { // Populate button
-            buttons.add(new Button(x - 42, y, 20, 20, Component.translatable("info." + PrettyPipes.ID + ".populate"), button -> FluidButtonPacket.sendAndExecute(this.pipe.getBlockPos(), FluidButtonPacket.ButtonResult.FILTER_CHANGE, 1)) {
-                @Override
-                public void renderToolTip(PoseStack matrix, int x, int y) {
-                    gui.renderTooltip(matrix, Component.translatable("info." + PrettyPipes.ID + ".populate.description").withStyle(ChatFormatting.GRAY), x, y);
-                }
-            });
+            buttons.add(Button.builder(Component.translatable("info." + PrettyPipes.ID + ".populate"), button -> FluidButtonPacket.sendAndExecute(this.pipe.getBlockPos(), FluidButtonPacket.ButtonResult.FILTER_CHANGE, 1))
+                .bounds(x - 42, y, 20, 20)
+                .tooltip(Tooltip.create(Component.translatable("info." + PrettyPipes.ID + ".populate.description").withStyle(ChatFormatting.GRAY)))
+                .build());
+
         }
 
         return buttons;
@@ -207,7 +205,6 @@ public class FluidFilter extends ItemStackHandler {
     public void setModified(boolean modified) {
         this.modified = modified;
     }
-
 
 
     public interface IFluidFilteredContainer {

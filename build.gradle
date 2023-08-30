@@ -78,8 +78,11 @@ repositories {
 
 dependencies {
     minecraft "net.minecraftforge:forge:${mc_version}-${forge_version}"
+
+    minecraftLibrary "org.jgrapht:jgrapht-core:${jgt_version}"
+    implementation fg.deobf("de.ellpeck.prettypipes:PrettyPipes:${pp_version}")
+
     runtimeOnly fg.deobf("curse.maven:ITank-256991:${itank_curse_version}")
-    implementation fg.deobf("de.ellpeck.prettypipes:PrettyPipes:${pp_version}") { transitive = false }
     runtimeOnly fg.deobf("mezz.jei:jei-${mc_version}-forge:${jei_version}")
     compileOnly fg.deobf("mezz.jei:jei-${mc_version}-forge-api:${jei_version}")
 

@@ -50,7 +50,7 @@ public class FluidBlobRenderer {
         float tz = Mth.lerp(partialTicks, item.lastZ, item.z);
 
         TextureAtlasSprite sprite = getFluidStillSprite(fluid);
-        VertexConsumer vbuf = sprite.wrap(buffer.getBuffer(RenderType.entityTranslucent(sprite.atlas().location())));
+        VertexConsumer vbuf = sprite.wrap(buffer.getBuffer(RenderType.entityTranslucent(sprite.atlasLocation())));
 
         matrix.pushPose();
         matrix.translate(tx, ty, tz);

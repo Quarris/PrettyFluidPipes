@@ -31,7 +31,7 @@ public class MenuSetup {
 
     private static <T extends AbstractPipeContainer<?>> MenuType<T> createPipeContainer() {
         return IForgeMenuType.create((windowId, inv, data) -> {
-            PipeBlockEntity tile = Utility.getBlockEntity(PipeBlockEntity.class, inv.player.level, data.readBlockPos());
+            PipeBlockEntity tile = Utility.getBlockEntity(PipeBlockEntity.class, inv.player.level(), data.readBlockPos());
             int moduleIndex = data.readInt();
             ItemStack moduleStack = tile.modules.getStackInSlot(moduleIndex);
             return (T) ((IModule) moduleStack.getItem()).getContainer(moduleStack, tile, windowId, inv, inv.player, moduleIndex);
