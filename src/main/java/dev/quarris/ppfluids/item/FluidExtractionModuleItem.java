@@ -16,8 +16,8 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 
 public class FluidExtractionModuleItem extends FluidModuleItem implements IFluidFilterProvider {
 
@@ -31,7 +31,7 @@ public class FluidExtractionModuleItem extends FluidModuleItem implements IFluid
         this.maxExtraction = tier.forTier(500, 2000, 8000);
         this.speed = tier.forTier(40, 20, 10);
         this.filterSlots = tier.forTier(2, 4, 8);
-        this.preventOversending = tier.forTier(true, true, true);
+        this.preventOversending = true;
     }
 
     @Override

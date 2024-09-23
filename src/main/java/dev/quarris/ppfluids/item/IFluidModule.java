@@ -4,8 +4,8 @@ import de.ellpeck.prettypipes.items.IModule;
 import de.ellpeck.prettypipes.pipe.PipeBlockEntity;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.items.IItemHandler;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.items.IItemHandler;
 
 public interface IFluidModule extends IModule {
 

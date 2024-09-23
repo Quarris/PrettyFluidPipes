@@ -11,10 +11,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.gui.widget.ExtendedButton;
-import org.apache.commons.lang3.ArrayUtils;
+import net.neoforged.neoforge.client.gui.widget.ExtendedButton;
 
 public class FluidDirectionSelector extends DirectionSelector {
 
@@ -23,7 +20,6 @@ public class FluidDirectionSelector extends DirectionSelector {
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
     public AbstractWidget getButton(int x, int y) {
         DirectionSelectorAccessor accessor = (DirectionSelectorAccessor) this;
         return new ExtendedButton(x, y, 100, 20, Component.translatable("info." + PrettyPipes.ID + ".populate"), button ->

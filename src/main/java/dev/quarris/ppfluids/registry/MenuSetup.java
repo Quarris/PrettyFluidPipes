@@ -8,21 +8,21 @@ import dev.quarris.ppfluids.ModRef;
 import dev.quarris.ppfluids.container.FluidExtractionModuleContainer;
 import dev.quarris.ppfluids.container.FluidFilterModuleContainer;
 import dev.quarris.ppfluids.container.FluidRetrievalModuleContainer;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.extensions.IForgeMenuType;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredRegister;
 
 public class MenuSetup {
 
-    public static final DeferredRegister<MenuType<?>> REGISTRY = DeferredRegister.create(ForgeRegistries.MENU_TYPES, ModRef.ID);
+    public static final DeferredRegister<MenuType<?>> REGISTRY = DeferredRegister.create(Registries.MENU, ModRef.ID);
 
-    public static final RegistryObject<MenuType<FluidFilterModuleContainer>> FLUID_FILTER_CONTAINER = REGISTRY.register("fluid_filter", MenuSetup::createPipeContainer);
-    public static final RegistryObject<MenuType<FluidExtractionModuleContainer>> FLUID_EXTRACTION_CONTAINER = REGISTRY.register("fluid_extraction", MenuSetup::createPipeContainer);
-    public static final RegistryObject<MenuType<FluidRetrievalModuleContainer>> FLUID_RETRIEVAL_CONTAINER = REGISTRY.register("fluid_retrieval", MenuSetup::createPipeContainer);
+    public static final DeferredHolder<MenuType<?>, MenuType<FluidFilterModuleContainer>> FLUID_FILTER_CONTAINER = REGISTRY.register("fluid_filter", MenuSetup::createPipeContainer);
+    public static final DeferredHolder<MenuType<?>, MenuType<FluidExtractionModuleContainer>> FLUID_EXTRACTION_CONTAINER = REGISTRY.register("fluid_extraction", MenuSetup::createPipeContainer);
+    public static final DeferredHolder<MenuType<?>, MenuType<FluidRetrievalModuleContainer>> FLUID_RETRIEVAL_CONTAINER = REGISTRY.register("fluid_retrieval", MenuSetup::createPipeContainer);
 
 
     public static void init(IEventBus bus) {
@@ -30,7 +30,7 @@ public class MenuSetup {
     }
 
     private static <T extends AbstractPipeContainer<?>> MenuType<T> createPipeContainer() {
-        return IForgeMenuType.create((windowId, inv, data) -> {
+        return IMenuTypeExtension.create((windowId, inv, data) -> {
             PipeBlockEntity tile = Utility.getBlockEntity(PipeBlockEntity.class, inv.player.level(), data.readBlockPos());
             int moduleIndex = data.readInt();
             ItemStack moduleStack = tile.modules.getStackInSlot(moduleIndex);

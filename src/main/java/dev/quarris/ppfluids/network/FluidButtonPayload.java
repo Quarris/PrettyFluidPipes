@@ -1,53 +1,57 @@
 package dev.quarris.ppfluids.network;
 
+import dev.quarris.ppfluids.ModRef;
 import dev.quarris.ppfluids.misc.FluidFilter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.network.NetworkEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.handling.PlayPayloadContext;
 import org.apache.logging.log4j.util.TriConsumer;
 
-import java.util.function.Supplier;
-
-public class FluidButtonPacket {
+public class FluidButtonPayload implements CustomPacketPayload {
+    public static final ResourceLocation ID = ModRef.res("fluid_button");
     private BlockPos pos;
     private ButtonResult result;
     private int[] data;
 
-    public FluidButtonPacket(BlockPos pos, ButtonResult result, int... data) {
+    public FluidButtonPayload(BlockPos pos, ButtonResult result, int... data) {
         this.pos = pos;
         this.result = result;
         this.data = data;
     }
 
-    private FluidButtonPacket() {
+
+    public FluidButtonPayload(FriendlyByteBuf buf) {
+        this.pos = buf.readBlockPos();
+        this.result = ButtonResult.values()[buf.readByte()];
+        this.data = buf.readVarIntArray();
     }
 
-    public static FluidButtonPacket decode(FriendlyByteBuf buf) {
-        FluidButtonPacket packet = new FluidButtonPacket();
-        packet.pos = buf.readBlockPos();
-        packet.result = ButtonResult.values()[buf.readByte()];
-        packet.data = buf.readVarIntArray();
-        return packet;
+    @Override
+    public void write(FriendlyByteBuf pBuf) {
+        pBuf.writeBlockPos(this.pos);
+        pBuf.writeByte(this.result.ordinal());
+        pBuf.writeVarIntArray(this.data);
     }
 
-    public static void encode(FluidButtonPacket packet, FriendlyByteBuf buf) {
-        buf.writeBlockPos(packet.pos);
-        buf.writeByte(packet.result.ordinal());
-        buf.writeVarIntArray(packet.data);
+    @Override
+    public ResourceLocation id() {
+        return ID;
     }
 
-    public static void handle(final FluidButtonPacket message, final Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> {
-            Player player = ctx.get().getSender();
+    public static void onMessage(final FluidButtonPayload message, PlayPayloadContext ctx) {
+        ctx.workHandler().execute(() -> {
+            Player player = ctx.player().orElseThrow();
             message.result.action.accept(message.pos, message.data, player);
         });
-        ctx.get().setPacketHandled(true);
     }
 
     public static void sendAndExecute(BlockPos pos, ButtonResult result, int... data) {
-        PacketHandler.sendToServer(new FluidButtonPacket(pos, result, data));
+        PacketDistributor.SERVER.noArg().send(new FluidButtonPayload(pos, result, data));
         result.action.accept(pos, data, Minecraft.getInstance().player);
     }
 

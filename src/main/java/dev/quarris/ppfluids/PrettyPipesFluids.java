@@ -4,12 +4,12 @@ import dev.quarris.ppfluids.registry.BlockEntitySetup;
 import dev.quarris.ppfluids.registry.BlockSetup;
 import dev.quarris.ppfluids.registry.ItemSetup;
 import dev.quarris.ppfluids.registry.MenuSetup;
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModLoadingContext;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
 @Mod(ModRef.ID)
 public class PrettyPipesFluids {
@@ -22,6 +22,6 @@ public class PrettyPipesFluids {
         BlockEntitySetup.init(modBus);
         MenuSetup.init(modBus);
 
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, ModConfigs.register(new ForgeConfigSpec.Builder()));
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, ModConfigs.register(new ModConfigSpec.Builder()));
     }
 }

@@ -17,10 +17,9 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.items.IItemHandler;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidUtil;
+import net.neoforged.neoforge.items.IItemHandler;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Optional;
@@ -37,7 +36,7 @@ public class FluidRetrievalModuleItem extends FluidModuleItem implements IFluidF
         this.maxExtraction = tier.forTier(500, 2000, 8000);
         this.speed = tier.forTier(40, 20, 10);
         this.filterSlots = tier.forTier(2, 4, 8);
-        this.preventOversending = tier.forTier(true, true, true);
+        this.preventOversending = true;
     }
 
     @Override

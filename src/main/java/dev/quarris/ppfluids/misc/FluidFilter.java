@@ -1,10 +1,8 @@
 package dev.quarris.ppfluids.misc;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import de.ellpeck.prettypipes.PrettyPipes;
-import de.ellpeck.prettypipes.packets.PacketButton;
 import dev.quarris.ppfluids.container.FluidFilterSlot;
-import dev.quarris.ppfluids.network.FluidButtonPacket;
+import dev.quarris.ppfluids.network.FluidButtonPayload;
 import dev.quarris.ppfluids.pipe.FluidPipeBlockEntity;
 import dev.quarris.ppfluids.registry.ItemSetup;
 import net.minecraft.ChatFormatting;
@@ -17,13 +15,10 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.items.ItemHandlerHelper;
-import net.minecraftforge.items.ItemStackHandler;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidUtil;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.items.ItemStackHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,13 +55,12 @@ public class FluidFilter extends ItemStackHandler {
         return slots;
     }
 
-    @OnlyIn(Dist.CLIENT)
     public List<AbstractWidget> createButtons(final Screen gui, int x, int y) {
         List<AbstractWidget> buttons = new ArrayList<>();
         if (this.canModifyWhitelist) {  // Allowed/Disallowed button
             Supplier<String> whitelistText = () -> "info." + PrettyPipes.ID + "." + (this.isWhitelist ? "whitelist" : "blacklist");
             buttons.add(Button.builder(Component.translatable(whitelistText.get()), button -> {
-                    FluidButtonPacket.sendAndExecute(this.pipe.getBlockPos(), FluidButtonPacket.ButtonResult.FILTER_CHANGE, 0);
+                    FluidButtonPayload.sendAndExecute(this.pipe.getBlockPos(), FluidButtonPayload.ButtonResult.FILTER_CHANGE, 0);
                     button.setMessage(Component.translatable(whitelistText.get()));
                 })
                 .bounds(x - 20, y, 20, 20)
@@ -75,7 +69,7 @@ public class FluidFilter extends ItemStackHandler {
         }
 
         if (this.canPopulateFromTanks) { // Populate button
-            buttons.add(Button.builder(Component.translatable("info." + PrettyPipes.ID + ".populate"), button -> FluidButtonPacket.sendAndExecute(this.pipe.getBlockPos(), FluidButtonPacket.ButtonResult.FILTER_CHANGE, 1))
+            buttons.add(Button.builder(Component.translatable("info." + PrettyPipes.ID + ".populate"), button -> FluidButtonPayload.sendAndExecute(this.pipe.getBlockPos(), FluidButtonPayload.ButtonResult.FILTER_CHANGE, 1))
                 .bounds(x - 42, y, 20, 20)
                 .tooltip(Tooltip.create(Component.translatable("info." + PrettyPipes.ID + ".populate.description").withStyle(ChatFormatting.GRAY)))
                 .build());

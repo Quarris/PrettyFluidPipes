@@ -1,6 +1,5 @@
 package dev.quarris.ppfluids.registry;
 
-import de.ellpeck.prettypipes.Registry;
 import de.ellpeck.prettypipes.items.ModuleItem;
 import de.ellpeck.prettypipes.items.ModuleTier;
 import de.ellpeck.prettypipes.pipe.IPipeItem;
@@ -12,20 +11,19 @@ import dev.quarris.ppfluids.item.FluidRetrievalModuleItem;
 import dev.quarris.ppfluids.pipenetwork.FluidPipeItem;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.registries.DeferredItem;
+import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.Locale;
 import java.util.function.BiFunction;
+import java.util.function.Supplier;
 
 public class ItemSetup {
 
-    public static final DeferredRegister<Item> REGISTRY = DeferredRegister.create(ForgeRegistries.ITEMS, ModRef.ID);
+    public static final DeferredRegister.Items REGISTRY = DeferredRegister.Items.createItems(ModRef.ID);
 
-    public static final RegistryObject<Item> FLUID_HOLDER = REGISTRY.register("fluid_item", FluidItem::new);
-
+    public static final Supplier<FluidItem> FLUID_HOLDER = REGISTRY.register("fluid_item", FluidItem::new);
 
     static {
         REGISTRY.register(BlockSetup.FLUID_PIPE.getId().getPath(), () -> new BlockItem(BlockSetup.FLUID_PIPE.get(), new Item.Properties()));

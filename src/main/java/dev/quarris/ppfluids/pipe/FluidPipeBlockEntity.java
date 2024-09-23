@@ -14,10 +14,10 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.items.IItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.items.IItemHandler;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.List;
@@ -26,8 +26,7 @@ import java.util.stream.Collectors;
 public class FluidPipeBlockEntity extends PipeBlockEntity {
 
     public FluidPipeBlockEntity(BlockPos pos, BlockState state) {
-        super(pos, state);
-        this.type = BlockEntitySetup.FLUID_PIPE.get();
+        super(BlockEntitySetup.FLUID_PIPE.get(), pos, state);
     }
 
     @Override
@@ -132,7 +131,7 @@ public class FluidPipeBlockEntity extends PipeBlockEntity {
         BlockPos pos = this.getBlockPos().relative(dir);
         BlockEntity tile = this.level.getBlockEntity(pos);
         if (tile != null) {
-            IFluidHandler handler = tile.getCapability(ForgeCapabilities.FLUID_HANDLER, dir.getOpposite()).orElse(null);
+            IFluidHandler handler = level.getCapability(Capabilities.FluidHandler.BLOCK, pos, dir.getOpposite());
             if (handler != null) {
                 return handler;
             }

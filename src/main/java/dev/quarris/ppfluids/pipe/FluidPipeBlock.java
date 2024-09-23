@@ -13,10 +13,14 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import org.jetbrains.annotations.Nullable;
 
 public class FluidPipeBlock extends PipeBlock {
+
+    public FluidPipeBlock(Properties properties) {
+        super(properties);
+    }
 
     @Override
     public @Nullable BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
@@ -39,11 +43,12 @@ public class FluidPipeBlock extends PipeBlock {
 
         BlockEntity tile = level.getBlockEntity(offset);
         if (tile != null) {
-            IPipeConnectable connectable = tile.getCapability(Registry.pipeConnectableCapability, opposite).orElse(null);
-            if (connectable != null)
+            IPipeConnectable connectable = level.getCapability(Registry.pipeConnectableCapability, offset, opposite);
+            if (connectable != null) {
                 return connectable.getConnectionType(pos, direction);
+            }
 
-            if (tile.getCapability(ForgeCapabilities.FLUID_HANDLER, opposite).isPresent()) {
+            if (level.getCapability(Capabilities.FluidHandler.BLOCK, offset, opposite) != null) {
                 return ConnectionType.CONNECTED;
             }
         }
