@@ -5,7 +5,7 @@ import de.ellpeck.prettypipes.items.ModuleTier;
 import de.ellpeck.prettypipes.misc.DirectionSelector;
 import de.ellpeck.prettypipes.pipe.PipeBlockEntity;
 import de.ellpeck.prettypipes.pipe.containers.AbstractPipeContainer;
-import dev.quarris.ppfluids.container.FluidExtractionModuleContainer;
+import dev.quarris.ppfluids.container.FluidExtractionContainer;
 import dev.quarris.ppfluids.misc.FluidDirectionSelector;
 import dev.quarris.ppfluids.misc.FluidFilter;
 import dev.quarris.ppfluids.pipe.FluidPipeBlockEntity;
@@ -64,12 +64,12 @@ public class FluidExtractionModuleItem extends FluidModuleItem implements IFluid
     }
 
     @Override
-    public boolean canNetworkSee(ItemStack module, PipeBlockEntity pipe, Direction dir, IFluidHandler destination) {
+    public boolean canNetworkSee(ItemStack module, PipeBlockEntity pipe, Direction dir, IFluidHandler tank) {
         return !this.getDirectionSelector(module, pipe).has(dir);
     }
 
     @Override
-    public boolean canAcceptItem(ItemStack module, PipeBlockEntity pipe, ItemStack stack, Direction dir, IFluidHandler destination) {
+    public boolean canAcceptItem(ItemStack module, PipeBlockEntity pipe, ItemStack stack, Direction dir, IFluidHandler tank) {
         return !this.getDirectionSelector(module, pipe).has(dir);
     }
 
@@ -85,7 +85,7 @@ public class FluidExtractionModuleItem extends FluidModuleItem implements IFluid
 
     @Override
     public AbstractPipeContainer<?> getContainer(ItemStack module, PipeBlockEntity tile, int windowId, Inventory inv, Player player, int moduleIndex) {
-        return new FluidExtractionModuleContainer(MenuSetup.FLUID_EXTRACTION_CONTAINER.get(), windowId, player, tile.getBlockPos(), moduleIndex);
+        return new FluidExtractionContainer(MenuSetup.FLUID_EXTRACTION.get(), windowId, player, tile.getBlockPos(), moduleIndex);
     }
 
     @Override

@@ -1,10 +1,17 @@
 package dev.quarris.ppfluids.network;
 
+import de.ellpeck.prettypipes.pipe.containers.AbstractPipeContainer;
+import de.ellpeck.prettypipes.pipe.modules.stacksize.StackSizeModuleItem;
 import dev.quarris.ppfluids.ModRef;
+import dev.quarris.ppfluids.client.screen.FluidLimiterScreen;
+import dev.quarris.ppfluids.item.FluidLimiterModuleItem;
 import dev.quarris.ppfluids.misc.FluidFilter;
+import dev.quarris.ppfluids.registry.DataComponentSetup;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -14,8 +21,6 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.apache.logging.log4j.util.TriConsumer;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public record FluidButtonPayload(
@@ -59,6 +64,16 @@ public record FluidButtonPayload(
             FluidFilter.IFluidFilteredContainer container = (FluidFilter.IFluidFilteredContainer) player.containerMenu;
             FluidFilter filter = container.getFilter();
             filter.onButtonPacket(container, data.get(0));
+        }),
+        LIMITER_MEASURE((pos, data, player) -> {
+            AbstractPipeContainer<?> container = (AbstractPipeContainer)player.containerMenu;
+            FluidLimiterModuleItem.LimiterData moduleData = container.moduleStack.getOrDefault(DataComponentSetup.FLUID_LIMITER, FluidLimiterModuleItem.LimiterData.DEFAULT);
+            container.moduleStack.set(DataComponentSetup.FLUID_LIMITER, new FluidLimiterModuleItem.LimiterData(moduleData.maxAmount(), !moduleData.useBucketMeasure()));
+        }),
+        LIMITER_AMOUNT((pos, data, player) -> {
+            AbstractPipeContainer<?> container = (AbstractPipeContainer)player.containerMenu;
+            FluidLimiterModuleItem.LimiterData moduleData = container.moduleStack.getOrDefault(DataComponentSetup.FLUID_LIMITER, FluidLimiterModuleItem.LimiterData.DEFAULT);
+            container.moduleStack.set(DataComponentSetup.FLUID_LIMITER, new FluidLimiterModuleItem.LimiterData(data.getFirst(), moduleData.useBucketMeasure()));
         });
 
         public final TriConsumer<BlockPos, List<Integer>, Player> action;

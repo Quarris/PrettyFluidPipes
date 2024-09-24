@@ -1,14 +1,14 @@
 package dev.quarris.ppfluids.client.screen;
 
 import de.ellpeck.prettypipes.pipe.containers.AbstractPipeGui;
-import dev.quarris.ppfluids.container.FluidExtractionModuleContainer;
+import dev.quarris.ppfluids.container.FluidRetrievalContainer;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
-public class FluidExtractionModuleScreen extends AbstractPipeGui<FluidExtractionModuleContainer> {
+public class FluidRetrievalScreen extends AbstractPipeGui<FluidRetrievalContainer> {
 
-    public FluidExtractionModuleScreen(FluidExtractionModuleContainer screenContainer, Inventory inv, Component titleIn) {
+    public FluidRetrievalScreen(FluidRetrievalContainer screenContainer, Inventory inv, Component titleIn) {
         super(screenContainer, inv, titleIn);
     }
 
@@ -20,5 +20,6 @@ public class FluidExtractionModuleScreen extends AbstractPipeGui<FluidExtraction
         }
 
         this.addRenderableWidget(this.menu.getSelector().getButton(this.leftPos + 7, this.topPos + 17 + 32 + 20));
+
     }
 }

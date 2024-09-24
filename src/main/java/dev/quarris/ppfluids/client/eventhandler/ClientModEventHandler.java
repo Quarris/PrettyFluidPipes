@@ -2,9 +2,10 @@ package dev.quarris.ppfluids.client.eventhandler;
 
 import de.ellpeck.prettypipes.pipe.PipeRenderer;
 import dev.quarris.ppfluids.ModRef;
-import dev.quarris.ppfluids.client.screen.FluidExtractionModuleScreen;
-import dev.quarris.ppfluids.client.screen.FluidFilterModuleScreen;
-import dev.quarris.ppfluids.client.screen.FluidRetrievalModuleScreen;
+import dev.quarris.ppfluids.client.screen.FluidExtractionScreen;
+import dev.quarris.ppfluids.client.screen.FluidFilterScreen;
+import dev.quarris.ppfluids.client.screen.FluidLimiterScreen;
+import dev.quarris.ppfluids.client.screen.FluidRetrievalScreen;
 import dev.quarris.ppfluids.registry.BlockEntitySetup;
 import dev.quarris.ppfluids.registry.BlockSetup;
 import dev.quarris.ppfluids.registry.MenuSetup;
@@ -21,15 +22,11 @@ import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 public class ClientModEventHandler {
 
     @SubscribeEvent
-    public static void setup(FMLClientSetupEvent event) {
-        ItemBlockRenderTypes.setRenderLayer(BlockSetup.FLUID_PIPE.get(), RenderType.cutout());
-    }
-
-    @SubscribeEvent
     public static void registerMenus(RegisterMenuScreensEvent event) {
-        event.register(MenuSetup.FLUID_FILTER_CONTAINER.get(), FluidFilterModuleScreen::new);
-        event.register(MenuSetup.FLUID_EXTRACTION_CONTAINER.get(), FluidExtractionModuleScreen::new);
-        event.register(MenuSetup.FLUID_RETRIEVAL_CONTAINER.get(), FluidRetrievalModuleScreen::new);
+        event.register(MenuSetup.FLUID_FILTER.get(), FluidFilterScreen::new);
+        event.register(MenuSetup.FLUID_EXTRACTION.get(), FluidExtractionScreen::new);
+        event.register(MenuSetup.FLUID_RETRIEVAL.get(), FluidRetrievalScreen::new);
+        event.register(MenuSetup.FLUID_LIMITER.get(), FluidLimiterScreen::new);
     }
 
     @SubscribeEvent

@@ -2,7 +2,7 @@ package dev.quarris.ppfluids.container;
 
 import de.ellpeck.prettypipes.misc.DirectionSelector;
 import de.ellpeck.prettypipes.pipe.containers.AbstractPipeContainer;
-import dev.quarris.ppfluids.item.FluidFilterModuleItem;
+import dev.quarris.ppfluids.item.FluidRetrievalModuleItem;
 import dev.quarris.ppfluids.misc.FluidFilter;
 import dev.quarris.ppfluids.pipe.FluidPipeBlockEntity;
 import net.minecraft.core.BlockPos;
@@ -14,12 +14,12 @@ import net.minecraft.world.inventory.Slot;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class FluidFilterModuleContainer extends AbstractPipeContainer<FluidFilterModuleItem> implements FluidFilter.IFluidFilteredContainer, DirectionSelector.IDirectionContainer {
+public class FluidRetrievalContainer extends AbstractPipeContainer<FluidRetrievalModuleItem> implements FluidFilter.IFluidFilteredContainer, DirectionSelector.IDirectionContainer {
 
     private FluidFilter filter;
     private DirectionSelector directionSelector;
 
-    public FluidFilterModuleContainer(@Nullable MenuType<?> type, int id, Player player, BlockPos pos, int moduleIndex) {
+    public FluidRetrievalContainer(@Nullable MenuType<?> type, int id, Player player, BlockPos pos, int moduleIndex) {
         super(type, id, player, pos, moduleIndex);
     }
 
@@ -27,13 +27,12 @@ public class FluidFilterModuleContainer extends AbstractPipeContainer<FluidFilte
     protected void addSlots() {
         this.filter = this.module.getFluidFilter(this.moduleStack, (FluidPipeBlockEntity) this.tile);
         this.directionSelector = this.module.getDirectionSelector(this.moduleStack, this.tile);
-        List<Slot> filterSlots = this.filter.createSlots((176 - Math.min(this.module.filterSlots, 9) * 18) / 2 + 1, 49);
+        List<Slot> filterSlots = this.filter.createSlots((176 - this.module.filterSlots * 18) / 2 + 1, 49);
         for (Slot slot : filterSlots) {
             this.addSlot(slot);
         }
     }
 
-    @Override
     public void removed(Player playerIn) {
         super.removed(playerIn);
         this.filter.save();
@@ -45,11 +44,6 @@ public class FluidFilterModuleContainer extends AbstractPipeContainer<FluidFilte
         if (!FluidFilterSlot.clickFilter(this, slotId, player)) {
             super.clicked(slotId, dragType, clickTypeIn, player);
         }
-    }
-
-    @Override
-    public void onFilterPopulated() {
-        this.filter.load();
     }
 
     @Override

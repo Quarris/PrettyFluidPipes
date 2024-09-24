@@ -21,7 +21,7 @@ public class FluidItem extends Item {
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag tooltipFlag) {
         tooltip.add(Component.translatable("info.ppfluids.fluid_item.usage"));
         FluidStack fluidStack = getFluidCopyFromItem(stack);
-        tooltip.add(Component.translatable(fluidStack.getTranslationKey())
+        tooltip.add(fluidStack.getHoverName().copy()
             .append(": ").append(String.valueOf(fluidStack.getAmount())));
     }
 

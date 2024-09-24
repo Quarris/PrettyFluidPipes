@@ -2,7 +2,7 @@ package dev.quarris.ppfluids.container;
 
 import de.ellpeck.prettypipes.misc.DirectionSelector;
 import de.ellpeck.prettypipes.pipe.containers.AbstractPipeContainer;
-import dev.quarris.ppfluids.item.FluidRetrievalModuleItem;
+import dev.quarris.ppfluids.item.FluidExtractionModuleItem;
 import dev.quarris.ppfluids.misc.FluidFilter;
 import dev.quarris.ppfluids.pipe.FluidPipeBlockEntity;
 import net.minecraft.core.BlockPos;
@@ -12,14 +12,13 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 
 import javax.annotation.Nullable;
-import java.util.List;
 
-public class FluidRetrievalModuleContainer extends AbstractPipeContainer<FluidRetrievalModuleItem> implements FluidFilter.IFluidFilteredContainer, DirectionSelector.IDirectionContainer {
+public class FluidExtractionContainer extends AbstractPipeContainer<FluidExtractionModuleItem> implements FluidFilter.IFluidFilteredContainer, DirectionSelector.IDirectionContainer {
 
     private FluidFilter filter;
     private DirectionSelector directionSelector;
 
-    public FluidRetrievalModuleContainer(@Nullable MenuType<?> type, int id, Player player, BlockPos pos, int moduleIndex) {
+    public FluidExtractionContainer(@Nullable MenuType<?> type, int id, Player player, BlockPos pos, int moduleIndex) {
         super(type, id, player, pos, moduleIndex);
     }
 
@@ -27,23 +26,24 @@ public class FluidRetrievalModuleContainer extends AbstractPipeContainer<FluidRe
     protected void addSlots() {
         this.filter = this.module.getFluidFilter(this.moduleStack, (FluidPipeBlockEntity) this.tile);
         this.directionSelector = this.module.getDirectionSelector(this.moduleStack, this.tile);
-        List<Slot> filterSlots = this.filter.createSlots((176 - this.module.filterSlots * 18) / 2 + 1, 49);
-        for (Slot slot : filterSlots) {
+        for (Slot slot : this.filter.createSlots((176 - this.module.filterSlots * 18) / 2 + 1, 17 + 32)) {
             this.addSlot(slot);
         }
     }
 
+    @Override
+    public void clicked(int slotId, int dragType, ClickType clickTypeIn, Player player) {
+        if (FluidFilterSlot.clickFilter(this, slotId, player))
+            return;
+
+        super.clicked(slotId, dragType, clickTypeIn, player);
+    }
+
+    @Override
     public void removed(Player playerIn) {
         super.removed(playerIn);
         this.filter.save();
         this.directionSelector.save();
-    }
-
-    @Override
-    public void clicked(int slotId, int dragType, ClickType clickTypeIn, Player player) {
-        if (!FluidFilterSlot.clickFilter(this, slotId, player)) {
-            super.clicked(slotId, dragType, clickTypeIn, player);
-        }
     }
 
     @Override

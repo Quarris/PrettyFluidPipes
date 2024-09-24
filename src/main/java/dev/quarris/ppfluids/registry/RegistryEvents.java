@@ -38,7 +38,7 @@ public class RegistryEvents {
 
     @SubscribeEvent
     public static void attachCapabilities(RegisterCapabilitiesEvent event) {
-        event.registerItem(Capabilities.FluidHandler.ITEM, (stack, ctx) -> new FluidHandlerItemStack.Consumable(DataComponentSetup.FLUID_CONTENT_DATA, stack, Integer.MAX_VALUE), ItemSetup.FLUID_HOLDER.get());
+        event.registerItem(Capabilities.FluidHandler.ITEM, (stack, ctx) -> new FluidHandlerItemStack.Consumable(DataComponentSetup.FLUID_CONTENT, stack, Integer.MAX_VALUE), ItemSetup.FLUID_HOLDER.get());
         event.registerBlockEntity(Registry.pipeConnectableCapability, BlockEntitySetup.FLUID_PIPE.get(), (e, d) -> e);
     }
 }

@@ -5,7 +5,7 @@ import de.ellpeck.prettypipes.items.ModuleTier;
 import de.ellpeck.prettypipes.misc.DirectionSelector;
 import de.ellpeck.prettypipes.pipe.PipeBlockEntity;
 import de.ellpeck.prettypipes.pipe.containers.AbstractPipeContainer;
-import dev.quarris.ppfluids.container.FluidFilterModuleContainer;
+import dev.quarris.ppfluids.container.FluidFilterContainer;
 import dev.quarris.ppfluids.misc.FluidDirectionSelector;
 import dev.quarris.ppfluids.misc.FluidFilter;
 import dev.quarris.ppfluids.pipe.FluidPipeBlockEntity;
@@ -28,7 +28,7 @@ public class FluidFilterModuleItem extends FluidModuleItem implements IFluidFilt
         this.canPopulateFromTanks = tier.forTier(false, false, true);
     }
 
-    public boolean canAcceptItem(ItemStack module, PipeBlockEntity pipe, ItemStack stack, Direction dir, IFluidHandler destination) {
+    public boolean canAcceptItem(ItemStack module, PipeBlockEntity pipe, ItemStack stack, Direction dir, IFluidHandler tank) {
         if (!(pipe instanceof FluidPipeBlockEntity)) return false;
         return !this.getDirectionSelector(module, pipe).has(dir) || this.getFluidFilter(module, (FluidPipeBlockEntity) pipe).isPipeItemAllowed(stack);
     }
@@ -42,7 +42,7 @@ public class FluidFilterModuleItem extends FluidModuleItem implements IFluidFilt
     }
 
     public AbstractPipeContainer<?> getContainer(ItemStack module, PipeBlockEntity tile, int windowId, Inventory inv, Player player, int moduleIndex) {
-        return new FluidFilterModuleContainer(MenuSetup.FLUID_FILTER_CONTAINER.get(), windowId, player, tile.getBlockPos(), moduleIndex);
+        return new FluidFilterContainer(MenuSetup.FLUID_FILTER.get(), windowId, player, tile.getBlockPos(), moduleIndex);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package dev.quarris.ppfluids.pipe;
 
+import de.ellpeck.prettypipes.items.IModule;
 import de.ellpeck.prettypipes.network.PipeNetwork;
 import de.ellpeck.prettypipes.pipe.IPipeConnectable;
 import de.ellpeck.prettypipes.pipe.PipeBlockEntity;
@@ -29,16 +30,6 @@ public class FluidPipeBlockEntity extends PipeBlockEntity {
         super(BlockEntitySetup.FLUID_PIPE.get(), pos, state);
     }
 
-    @Override
-    public Pair<BlockPos, ItemStack> getAvailableDestinationOrConnectable(ItemStack stack, boolean force, boolean preventOversending) {
-        return super.getAvailableDestinationOrConnectable(stack, force, preventOversending);
-    }
-
-    @Override
-    public Pair<BlockPos, ItemStack> getAvailableDestination(Direction[] directions, ItemStack stack, boolean force, boolean preventOversending) {
-        return super.getAvailableDestination(directions, stack, force, preventOversending);
-    }
-
     public Pair<BlockPos, ItemStack> getAvailableDestination(Direction[] directions, FluidStack fluid, boolean force, boolean preventOversending) {
         if (!this.canWork()) {
             return null;
@@ -57,9 +48,10 @@ public class FluidPipeBlockEntity extends PipeBlockEntity {
             if (amountFilled > 0) {
                 FluidStack toInsert = fluid.copy();
                 toInsert.setAmount(amountFilled);
-                // TODO Replace maxAmount once a limiting module is implemented
-                int maxAmount = Integer.MAX_VALUE;
-                //int maxAmount = this.streamModules().mapToInt((m) -> ((IModule)m.getRight()).getMaxInsertionAmount(m.getLeft(), this, stack, handler)).min().orElse(Integer.MAX_VALUE);
+                int maxAmount = this.streamModules()
+                    .filter(m -> m.getRight() instanceof IFluidModule)
+                    .mapToInt(m -> ((IFluidModule) m.getRight()).getMaxInsertionAmount(m.getLeft(), this, fluid, tank))
+                    .min().orElse(Integer.MAX_VALUE);
                 if (maxAmount < toInsert.getAmount()) {
                     toInsert.setAmount(maxAmount);
                 }
@@ -77,7 +69,7 @@ public class FluidPipeBlockEntity extends PipeBlockEntity {
                     if (onTheWay > 0) {
                         FluidStack copy = toInsert.copy();
                         copy.setAmount(Integer.MAX_VALUE);
-                        int availableSpace = tank.fill(copy, IFluidHandler.FluidAction.SIMULATE);
+                        int availableSpace = Math.min(maxAmount, tank.fill(copy, IFluidHandler.FluidAction.SIMULATE));
                         if (onTheWay + toInsert.getAmount() > availableSpace) {
                             toInsert.setAmount(availableSpace - onTheWay);
                         }
@@ -104,7 +96,7 @@ public class FluidPipeBlockEntity extends PipeBlockEntity {
 
     @Override
     public boolean canHaveModules() {
-        for(Direction dir : Direction.values()) {
+        for (Direction dir : Direction.values()) {
             if (this.getFluidHandler(dir) != null) {
                 return true;
             }

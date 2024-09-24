@@ -15,7 +15,6 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.Direction;
-import net.minecraft.core.component.DataComponentType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -164,7 +163,7 @@ public class FluidFilter extends ItemStackHandler {
 
     public void save() {
         if (this.modified) {
-            this.stack.set(DataComponentSetup.FLUID_FILTER_DATA, new FilterData(this, this.isWhitelist));
+            this.stack.set(DataComponentSetup.FLUID_FILTER, new FilterData(this, this.isWhitelist));
             this.pipe.setChanged();
             this.modified = false;
         }
@@ -176,7 +175,7 @@ public class FluidFilter extends ItemStackHandler {
     }
 
     public void load() {
-        var content = this.stack.get(DataComponentSetup.FLUID_FILTER_DATA);
+        var content = this.stack.get(DataComponentSetup.FLUID_FILTER);
         if (content != null) {
             this.setSize(content.items.getSlots());
             for (var i = 0; i < this.getSlots(); i++)

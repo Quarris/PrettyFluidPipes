@@ -1,17 +1,18 @@
 package dev.quarris.ppfluids.client.screen;
 
 import de.ellpeck.prettypipes.pipe.containers.AbstractPipeGui;
-import dev.quarris.ppfluids.container.FluidFilterModuleContainer;
+import dev.quarris.ppfluids.container.FluidExtractionContainer;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
-public class FluidFilterModuleScreen extends AbstractPipeGui<FluidFilterModuleContainer> {
+public class FluidExtractionScreen extends AbstractPipeGui<FluidExtractionContainer> {
 
-    public FluidFilterModuleScreen(FluidFilterModuleContainer screenContainer, Inventory inv, Component titleIn) {
+    public FluidExtractionScreen(FluidExtractionContainer screenContainer, Inventory inv, Component titleIn) {
         super(screenContainer, inv, titleIn);
     }
 
+    @Override
     protected void init() {
         super.init();
         for (AbstractWidget button : this.menu.getFilter().createButtons(this, this.leftPos + this.imageWidth - 7, this.topPos + 17 + 32 + 20)) {

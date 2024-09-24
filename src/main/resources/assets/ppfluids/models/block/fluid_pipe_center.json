@@ -1,5 +1,6 @@
 {
     "parent": "prettypipes:block/pipe_center",
+    "render_type": "cutout",
     "textures": {
         "0": "ppfluids:block/fluid_pipe"
     }

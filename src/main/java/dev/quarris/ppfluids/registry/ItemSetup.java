@@ -4,10 +4,7 @@ import de.ellpeck.prettypipes.items.ModuleItem;
 import de.ellpeck.prettypipes.items.ModuleTier;
 import de.ellpeck.prettypipes.pipe.IPipeItem;
 import dev.quarris.ppfluids.ModRef;
-import dev.quarris.ppfluids.item.FluidExtractionModuleItem;
-import dev.quarris.ppfluids.item.FluidFilterModuleItem;
-import dev.quarris.ppfluids.item.FluidItem;
-import dev.quarris.ppfluids.item.FluidRetrievalModuleItem;
+import dev.quarris.ppfluids.item.*;
 import dev.quarris.ppfluids.pipenetwork.FluidPipeItem;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -26,7 +23,9 @@ public class ItemSetup {
     public static final Supplier<FluidItem> FLUID_HOLDER = REGISTRY.register("fluid_item", FluidItem::new);
 
     static {
-        REGISTRY.register(BlockSetup.FLUID_PIPE.getId().getPath(), () -> new BlockItem(BlockSetup.FLUID_PIPE.get(), new Item.Properties()));
+        REGISTRY.registerSimpleBlockItem(BlockSetup.FLUID_PIPE);
+        REGISTRY.registerItem("fluid_limiter_module", props -> new FluidLimiterModuleItem("fluid_limiter_module", props), new Item.Properties());
+
         registerTieredModule(REGISTRY, "fluid_extraction_module", new Item.Properties(), FluidExtractionModuleItem::new);
         registerTieredModule(REGISTRY, "fluid_filter_module", new Item.Properties(), FluidFilterModuleItem::new);
         registerTieredModule(REGISTRY, "fluid_retrieval_module", new Item.Properties(), FluidRetrievalModuleItem::new);
@@ -44,15 +43,4 @@ public class ItemSetup {
             registry.register(moduleName, () -> item.apply(name, tier, properties));
         }
     }
-    
-    /*private static Item[] createTieredModule(String name, BiFunction<String, ModuleTier, ModuleItem> item) {
-        Item[] items = new Item[ModuleTier.values().length];
-        int i = 0;
-        for (ModuleTier tier : ModuleTier.values()) {
-            items[i] = item.apply(name, tier).setRegistryName(ModRef.ID, tier.name().toLowerCase(Locale.ROOT) + "_" + name);
-            i++;
-        }
-        return items;
-    }*/
-    
 }

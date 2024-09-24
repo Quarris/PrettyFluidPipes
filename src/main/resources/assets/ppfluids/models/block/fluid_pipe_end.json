@@ -1,3 +1,4 @@
 {
-    "parent": "prettypipes:block/pipe_end"
+    "parent": "prettypipes:block/pipe_end",
+    "render_type": "cutout"
 }

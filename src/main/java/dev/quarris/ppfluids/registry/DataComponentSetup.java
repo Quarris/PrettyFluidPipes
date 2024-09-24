@@ -1,6 +1,7 @@
 package dev.quarris.ppfluids.registry;
 
 import dev.quarris.ppfluids.ModRef;
+import dev.quarris.ppfluids.item.FluidLimiterModuleItem;
 import dev.quarris.ppfluids.misc.FluidFilter;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
@@ -14,8 +15,9 @@ public class DataComponentSetup {
 
     public static final DeferredRegister<DataComponentType<?>> REGISTRY = DeferredRegister.create(Registries.DATA_COMPONENT_TYPE, ModRef.ID);
 
-    public static final Supplier<DataComponentType<SimpleFluidContent>> FLUID_CONTENT_DATA = REGISTRY.register("fluid_content", () -> DataComponentType.<SimpleFluidContent>builder().persistent(SimpleFluidContent.CODEC).cacheEncoding().build());
-    public static final Supplier<DataComponentType<FluidFilter.FilterData>> FLUID_FILTER_DATA =  REGISTRY.register("fluid_filter", () -> DataComponentType.<FluidFilter.FilterData>builder().persistent(FluidFilter.FilterData.CODEC).cacheEncoding().build());
+    public static final Supplier<DataComponentType<SimpleFluidContent>> FLUID_CONTENT = REGISTRY.register("fluid_content", () -> DataComponentType.<SimpleFluidContent>builder().persistent(SimpleFluidContent.CODEC).cacheEncoding().build());
+    public static final Supplier<DataComponentType<FluidFilter.FilterData>> FLUID_FILTER =  REGISTRY.register("fluid_filter", () -> DataComponentType.<FluidFilter.FilterData>builder().persistent(FluidFilter.FilterData.CODEC).cacheEncoding().build());
+    public static final Supplier<DataComponentType<FluidLimiterModuleItem.LimiterData>> FLUID_LIMITER =  REGISTRY.register("fluid_limiter", () -> DataComponentType.<FluidLimiterModuleItem.LimiterData>builder().persistent(FluidLimiterModuleItem.LimiterData.CODEC).cacheEncoding().build());
 
     public static void init(IEventBus bus) {
         REGISTRY.register(bus);

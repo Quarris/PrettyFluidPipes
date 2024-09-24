@@ -38,7 +38,7 @@ public class FluidNetworkLocation extends NetworkLocation {
         if (this.isEmpty(level))
             return Collections.emptyList();
         return this.getFluids(level).entrySet().stream()
-                .filter(kv -> kv.getValue().isFluidEqual(fluid) && this.canExtract(level, kv.getKey()))
+                .filter(kv -> FluidStack.isSameFluidSameComponents(kv.getValue(), fluid) && this.canExtract(level, kv.getKey()))
                 .map(Map.Entry::getKey).collect(Collectors.toList());
     }
 
@@ -46,7 +46,7 @@ public class FluidNetworkLocation extends NetworkLocation {
         if (this.isEmpty(level))
             return 0;
         return this.getFluids(level).entrySet().stream()
-                .filter(kv -> kv.getValue().isFluidEqual(fluid) && this.canExtract(level, kv.getKey()))
+                .filter(kv -> FluidStack.isSameFluidSameComponents(kv.getValue(), fluid) && this.canExtract(level, kv.getKey()))
                 .mapToInt(kv -> kv.getValue().getAmount()).sum();
     }
 
