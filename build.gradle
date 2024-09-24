@@ -139,8 +139,12 @@ curseforge {
         apiKey = System.getenv('CURSEFORGE_API_PUBLISH')
         id = '479142'
         changelog = file('changelog.md').text
+        changelogType = "markdown"
         releaseType = release_type
         addGameVersion mc_version // Add the Minecraft versions you're targeting
+        relations {
+            requiredDependency "pretty-pipes"
+        }
         mainArtifact(jar) {
             displayName = "$mod_name v$project.version"
         }
@@ -151,8 +155,12 @@ modrinth {
     token = System.getenv('MODRINTH_API_PUBLISH')
     projectId = 'pretty-pipes-fluids'
     versionNumber = project.version
+    versionName = "$mod_name v$project.version"
     versionType = release_type
     uploadFile = jar
     gameVersions = [mc_version] // Add the Minecraft versions you're targeting
     changelog = file('changelog.md').text
+    dependencies {
+        required.project "pretty-pipes"
+    }
 }
