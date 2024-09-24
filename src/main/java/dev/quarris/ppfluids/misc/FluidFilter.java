@@ -1,9 +1,13 @@
 package dev.quarris.ppfluids.misc;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import de.ellpeck.prettypipes.PrettyPipes;
+import de.ellpeck.prettypipes.Utility;
 import dev.quarris.ppfluids.container.FluidFilterSlot;
 import dev.quarris.ppfluids.network.FluidButtonPayload;
 import dev.quarris.ppfluids.pipe.FluidPipeBlockEntity;
+import dev.quarris.ppfluids.registry.DataComponentSetup;
 import dev.quarris.ppfluids.registry.ItemSetup;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -11,7 +15,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.Direction;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -27,7 +31,7 @@ import java.util.function.Supplier;
 
 public class FluidFilter extends ItemStackHandler {
 
-    protected ItemStack moduleItem;
+    protected ItemStack stack;
     protected FluidPipeBlockEntity pipe;
     public boolean isWhitelist;
 
@@ -35,16 +39,16 @@ public class FluidFilter extends ItemStackHandler {
     public boolean canModifyWhitelist = true;
     private boolean modified;
 
-    public FluidFilter(int size, ItemStack moduleItem, FluidPipeBlockEntity pipe, boolean isDefaultWhitelist) {
+    public FluidFilter(int size, ItemStack stack, FluidPipeBlockEntity pipe, boolean isDefaultWhitelist) {
         super(size);
         this.pipe = pipe;
-        this.moduleItem = moduleItem;
+        this.stack = stack;
         this.isWhitelist = isDefaultWhitelist;
         this.load();
     }
 
-    public FluidFilter(int size, ItemStack moduleItem, FluidPipeBlockEntity pipe) {
-        this(size, moduleItem, pipe, false);
+    public FluidFilter(int size, ItemStack stack, FluidPipeBlockEntity pipe) {
+        this(size, stack, pipe, false);
     }
 
     public List<Slot> createSlots(int x, int y) {
@@ -130,7 +134,7 @@ public class FluidFilter extends ItemStackHandler {
                 if (!filteredFluid.isPresent())
                     continue;
 
-                if (filteredFluid.get().equals(fluidStack)) {
+                if (filteredFluid.get().getFluidType() == fluidStack.getFluidType()) {
                     return true;
                 }
             }
@@ -146,7 +150,6 @@ public class FluidFilter extends ItemStackHandler {
         for (int slot = 0; slot < this.getSlots(); slot++) {
             if (this.getStackInSlot(slot).isEmpty()) {
                 this.setFilter(slot, stack);
-                this.modified = true;
                 return true;
             }
         }
@@ -161,7 +164,7 @@ public class FluidFilter extends ItemStackHandler {
 
     public void save() {
         if (this.modified) {
-            this.moduleItem.getOrCreateTag().put("filter", this.serializeNBT());
+            this.stack.set(DataComponentSetup.FLUID_FILTER_DATA, new FilterData(this, this.isWhitelist));
             this.pipe.setChanged();
             this.modified = false;
         }
@@ -173,26 +176,12 @@ public class FluidFilter extends ItemStackHandler {
     }
 
     public void load() {
-        if (this.moduleItem.hasTag() && this.moduleItem.getTag().contains("filter")) {
-            this.deserializeNBT(this.moduleItem.getTag().getCompound("filter"));
-        }
-    }
-
-    @Override
-    public CompoundTag serializeNBT() {
-        CompoundTag nbt = super.serializeNBT();
-        if (this.canModifyWhitelist) {
-            nbt.putBoolean("whitelist", this.isWhitelist);
-        }
-
-        return nbt;
-    }
-
-    @Override
-    public void deserializeNBT(CompoundTag nbt) {
-        super.deserializeNBT(nbt);
-        if (this.canModifyWhitelist) {
-            this.isWhitelist = nbt.getBoolean("whitelist");
+        var content = this.stack.get(DataComponentSetup.FLUID_FILTER_DATA);
+        if (content != null) {
+            this.setSize(content.items.getSlots());
+            for (var i = 0; i < this.getSlots(); i++)
+                this.setStackInSlot(i, content.items.getStackInSlot(i));
+            this.isWhitelist = content.whitelist;
         }
     }
 
@@ -206,5 +195,13 @@ public class FluidFilter extends ItemStackHandler {
 
         default void onFilterPopulated() {
         }
+
+    }
+
+    public record FilterData(ItemStackHandler items, boolean whitelist) {
+        public static final Codec<FilterData> CODEC = RecordCodecBuilder.create(i -> i.group(
+            Utility.ITEM_STACK_HANDLER_CODEC.fieldOf("items").forGetter(f -> f.items),
+            Codec.BOOL.fieldOf("whitelist").forGetter(f -> f.whitelist)
+        ).apply(i, FilterData::new));
     }
 }

@@ -4,13 +4,14 @@ import de.ellpeck.prettypipes.items.IModule;
 import de.ellpeck.prettypipes.items.ModuleItem;
 import de.ellpeck.prettypipes.pipe.PipeBlockEntity;
 import net.minecraft.core.Direction;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 
 public class FluidModuleItem extends ModuleItem implements IFluidModule {
 
-    public FluidModuleItem(String name) {
-        super(name);
+    public FluidModuleItem(String name, Item.Properties properties) {
+        super(name, properties);
     }
 
     @Override

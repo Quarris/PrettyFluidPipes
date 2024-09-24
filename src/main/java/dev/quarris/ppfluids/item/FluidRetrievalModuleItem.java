@@ -15,6 +15,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -31,8 +32,8 @@ public class FluidRetrievalModuleItem extends FluidModuleItem implements IFluidF
     private final boolean preventOversending;
     public final int filterSlots;
 
-    public FluidRetrievalModuleItem(String name, ModuleTier tier) {
-        super(name);
+    public FluidRetrievalModuleItem(String name, ModuleTier tier, Item.Properties properties) {
+        super(name, properties);
         this.maxExtraction = tier.forTier(500, 2000, 8000);
         this.speed = tier.forTier(40, 20, 10);
         this.filterSlots = tier.forTier(2, 4, 8);

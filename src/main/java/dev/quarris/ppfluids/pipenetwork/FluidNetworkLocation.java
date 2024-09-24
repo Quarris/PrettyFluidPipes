@@ -7,6 +7,7 @@ import de.ellpeck.prettypipes.pipe.PipeBlockEntity;
 import dev.quarris.ppfluids.pipe.FluidPipeBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -29,8 +30,8 @@ public class FluidNetworkLocation extends NetworkLocation {
         super(pipePos, direction);
     }
 
-    public FluidNetworkLocation(CompoundTag nbt) {
-        super(nbt);
+    public FluidNetworkLocation(HolderLookup.Provider provider, CompoundTag nbt) {
+        super(provider, nbt);
     }
 
     public List<Integer> getFluidSlots(Level level, FluidStack fluid) {

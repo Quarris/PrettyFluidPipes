@@ -10,6 +10,6 @@ public class ModRef {
     public static final Logger LOGGER = LogManager.getLogger();
 
     public static ResourceLocation res(String name) {
-        return new ResourceLocation(ID, name);
+        return ResourceLocation.fromNamespaceAndPath(ID, name);
     }
 }

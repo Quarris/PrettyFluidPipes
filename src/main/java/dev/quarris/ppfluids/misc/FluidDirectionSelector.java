@@ -13,6 +13,8 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.client.gui.widget.ExtendedButton;
 
+import java.util.List;
+
 public class FluidDirectionSelector extends DirectionSelector {
 
     public FluidDirectionSelector(ItemStack stack, PipeBlockEntity pipe) {
@@ -23,7 +25,7 @@ public class FluidDirectionSelector extends DirectionSelector {
     public AbstractWidget getButton(int x, int y) {
         DirectionSelectorAccessor accessor = (DirectionSelectorAccessor) this;
         return new ExtendedButton(x, y, 100, 20, Component.translatable("info." + PrettyPipes.ID + ".populate"), button ->
-            PacketButton.sendAndExecute(accessor.getPipe().getBlockPos(), PacketButton.ButtonResult.DIRECTION_SELECTOR)) {
+            PacketButton.sendAndExecute(accessor.getPipe().getBlockPos(), PacketButton.ButtonResult.DIRECTION_SELECTOR, List.of())) {
             @Override
             public Component getMessage() {
                 PipeBlockEntity pipe = accessor.getPipe();

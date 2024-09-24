@@ -13,6 +13,7 @@ import dev.quarris.ppfluids.registry.MenuSetup;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 
@@ -21,8 +22,8 @@ public class FluidFilterModuleItem extends FluidModuleItem implements IFluidFilt
     public final int filterSlots;
     private final boolean canPopulateFromTanks;
 
-    public FluidFilterModuleItem(String name, ModuleTier tier) {
-        super(name);
+    public FluidFilterModuleItem(String name, ModuleTier tier, Item.Properties properties) {
+        super(name, properties);
         this.filterSlots = tier.forTier(2, 4, 8);
         this.canPopulateFromTanks = tier.forTier(false, false, true);
     }

@@ -12,6 +12,7 @@ import dev.quarris.ppfluids.item.FluidItem;
 import dev.quarris.ppfluids.pipe.FluidPipeBlockEntity;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -25,7 +26,7 @@ import java.util.Random;
 
 public class FluidPipeItem extends PipeItem {
 
-    public static final ResourceLocation FLUID_TYPE = new ResourceLocation("prettypipes", "pipe_fluid");
+    public static final ResourceLocation FLUID_TYPE = ResourceLocation.fromNamespaceAndPath("prettypipes", "pipe_fluid");
 
     private long ticksExisted;
 
@@ -33,13 +34,12 @@ public class FluidPipeItem extends PipeItem {
         super(FLUID_TYPE, stack, speed);
     }
 
-    public FluidPipeItem(CompoundTag nbt) {
+    /*public FluidPipeItem(CompoundTag nbt) {
         this(FLUID_TYPE, nbt);
-    }
+    }*/
 
-    public FluidPipeItem(ResourceLocation type, CompoundTag nbt) {
-        super(type, nbt);
-        this.ticksExisted = nbt.getLong("TicksExisted");
+    public FluidPipeItem(HolderLookup.Provider provider, ResourceLocation type, CompoundTag nbt) {
+        super(provider, type, nbt);
     }
 
     public FluidStack getFluidContent() {
@@ -82,7 +82,7 @@ public class FluidPipeItem extends PipeItem {
             // second time: we arrived at our input chest, it is full, so we try to find a different goal location
             FluidStack remain = PipeNetworkUtil.routeFluid(currPipe.getLevel(), currPipe.getBlockPos(), this.destInventory, FluidItem.getFluidCopyFromItem(this.stack), (stack, speed) -> this, false);
             if (!remain.isEmpty())
-                this.drop(currPipe.getLevel(), FluidItem.createItemFromFluid(remain, false));
+                this.drop(currPipe.getLevel(), FluidItem.createItemFromFluid(remain));
         } else {
             // if all re-routing attempts fail, we drop
             this.drop(currPipe.getLevel(), this.stack);
@@ -109,11 +109,18 @@ public class FluidPipeItem extends PipeItem {
         return super.store(currPipe);
     }
 
+
     @Override
-    public CompoundTag serializeNBT() {
-        CompoundTag tag = super.serializeNBT();
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
+        CompoundTag tag = super.serializeNBT(provider);
         tag.putLong("TicksExisted", this.ticksExisted);
         return tag;
+    }
+
+    @Override
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag nbt) {
+        super.deserializeNBT(provider, nbt);
+        this.ticksExisted = nbt.getLong("TicksExisted");
     }
 
     @Override

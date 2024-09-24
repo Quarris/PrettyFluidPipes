@@ -37,10 +37,10 @@ public class FluidBlobRenderer {
         IClientFluidTypeExtensions attributes = IClientFluidTypeExtensions.of(renderState);
         float size = Mth.lerp(Math.min(1, fluidStack.getAmount() / 2000f), 0.1f - sizeOffset, 0.25f + sizeOffset);
         int color = attributes.getTintColor(renderState, Minecraft.getInstance().level, item.getCurrentPipe());
-        float r = ((color >> 16) & 0xFF) / 255f; // red
-        float g = ((color >> 8) & 0xFF) / 255f; // green
-        float b = ((color >> 0) & 0xFF) / 255f; // blue
-        float a = ((color >> 24) & 0xFF) / 255f; // alpha
+        //float r = ((color >> 16) & 0xFF) / 255f; // red
+        //float g = ((color >> 8) & 0xFF) / 255f; // green
+        //float b = ((color >> 0) & 0xFF) / 255f; // blue
+        //float a = ((color >> 24) & 0xFF) / 255f; // alpha
 
         float tx = Mth.lerp(partialTicks, item.lastX, item.x);
         float ty = Mth.lerp(partialTicks, item.lastY, item.y);
@@ -52,7 +52,7 @@ public class FluidBlobRenderer {
         matrix.pushPose();
         matrix.translate(tx, ty, tz);
         matrix.scale(size, size, size);
-        MODEL.renderToBuffer(matrix, vbuf, light, overlay, r, g, b, a);
+        MODEL.renderToBuffer(matrix, vbuf, light, overlay, color);
         matrix.popPose();
     }
 
@@ -78,8 +78,8 @@ public class FluidBlobRenderer {
         }
 
         @Override
-        public void renderToBuffer(PoseStack matrixStackIn, VertexConsumer bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
-            this.blob.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+        public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay, int color) {
+            this.blob.render(poseStack, buffer, packedLight, packedOverlay, color);
         }
     }
 

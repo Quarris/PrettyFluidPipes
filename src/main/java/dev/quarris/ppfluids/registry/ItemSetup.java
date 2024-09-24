@@ -12,8 +12,8 @@ import dev.quarris.ppfluids.pipenetwork.FluidPipeItem;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
+import org.apache.commons.lang3.function.TriFunction;
 
 import java.util.Locale;
 import java.util.function.BiFunction;
@@ -27,9 +27,10 @@ public class ItemSetup {
 
     static {
         REGISTRY.register(BlockSetup.FLUID_PIPE.getId().getPath(), () -> new BlockItem(BlockSetup.FLUID_PIPE.get(), new Item.Properties()));
-        registerTieredModule(REGISTRY, "fluid_extraction_module", FluidExtractionModuleItem::new);
-        registerTieredModule(REGISTRY, "fluid_filter_module", FluidFilterModuleItem::new);
-        registerTieredModule(REGISTRY, "fluid_retrieval_module", FluidRetrievalModuleItem::new);
+        registerTieredModule(REGISTRY, "fluid_extraction_module", new Item.Properties(), FluidExtractionModuleItem::new);
+        registerTieredModule(REGISTRY, "fluid_filter_module", new Item.Properties(), FluidFilterModuleItem::new);
+        registerTieredModule(REGISTRY, "fluid_retrieval_module", new Item.Properties(), FluidRetrievalModuleItem::new);
+
         IPipeItem.TYPES.put(FluidPipeItem.FLUID_TYPE, FluidPipeItem::new);
     }
 
@@ -37,10 +38,10 @@ public class ItemSetup {
         REGISTRY.register(bus);
     }
 
-    private static void registerTieredModule(DeferredRegister<Item> registry, String name, BiFunction<String, ModuleTier, ModuleItem> item) {
+    private static void registerTieredModule(DeferredRegister<Item> registry, String name, Item.Properties properties, TriFunction<String, ModuleTier, Item.Properties, ModuleItem> item) {
         for (ModuleTier tier : ModuleTier.values()) {
             String moduleName = tier.name().toLowerCase(Locale.ROOT) + "_" + name;
-            registry.register(moduleName, () -> item.apply(name, tier));
+            registry.register(moduleName, () -> item.apply(name, tier, properties));
         }
     }
     

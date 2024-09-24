@@ -83,33 +83,36 @@ public class PipeNetworkUtil {
         return FluidStack.EMPTY;
     }
 
-    public static FluidStack requestExistingFluid(Level level, FluidNetworkLocation location, BlockPos destPipe, BlockPos destInventory, NetworkLock ignoredLock, FluidStack fluid) {
+    public static FluidStack requestExistingFluid(Level level, FluidNetworkLocation location, BlockPos destPipe, BlockPos destInventory, NetworkLock ignoredLock, FluidStack requestedFluid) {
         PipeNetwork network = PipeNetwork.get(level);
         if (location.getPos().equals(destInventory))
-            return fluid;
+            return requestedFluid;
         // make sure we don't pull any locked items
-        int amount = location.getFluidAmount(level, fluid);
-        if (amount <= 0)
-            return fluid;
-        FluidStack remain = fluid.copy();
+        int stored = location.getFluidAmount(level, requestedFluid);
+        if (stored <= 0)
+            return requestedFluid;
         // make sure we only extract less than or equal to the requested amount
-        if (remain.getAmount() < amount)
-            amount = remain.getAmount();
-        remain.shrink(amount);
-        for (int slot : location.getFluidSlots(level, fluid)) {
+        int toExtract = stored;
+        if (requestedFluid.getAmount() < stored) {
+            toExtract = requestedFluid.getAmount();
+        }
+        FluidStack leftOver = requestedFluid.copy();
+        leftOver.shrink(toExtract);
+        for (int slot : location.getFluidSlots(level, requestedFluid)) {
             // try to extract from that location's inventory and send the item
             IFluidHandler handler = location.getFluidHandler(level);
             FluidStack stack = handler.getFluidInTank(slot).copy();
+            stack.setAmount(toExtract);
             FluidStack extracted = handler.drain(stack, IFluidHandler.FluidAction.SIMULATE);
-            ItemStack fluidItem = FluidItem.createItemFromFluid(extracted, false);
+            ItemStack fluidItem = FluidItem.createItemFromFluid(extracted);
             if (network.routeItemToLocation(location.pipePos, location.getPos(), destPipe, destInventory, fluidItem, speed -> new FluidPipeItem(fluidItem, speed))) {
                 handler.drain(extracted, IFluidHandler.FluidAction.EXECUTE);
-                amount -= extracted.getAmount();
-                if (amount <= 0)
+                toExtract -= extracted.getAmount();
+                if (toExtract <= 0)
                     break;
             }
         }
-        return remain;
+        return leftOver;
     }
 
     public static List<FluidNetworkLocation> getOrderedNetworkFluids(Level level, BlockPos node) {

@@ -9,7 +9,7 @@ displayName = "${mod_name}"
 logoFile = "logo.png"
 credits = "${mod_credits}"
 authors = "${mod_authors}"
-description = "${mod_description}"
+description = '''${mod_description}'''
 
 [[mixins]]
 config = "${mod_id}_base.mixins.json"

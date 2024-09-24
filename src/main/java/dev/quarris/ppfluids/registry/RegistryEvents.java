@@ -5,15 +5,14 @@ import dev.quarris.ppfluids.ModRef;
 import dev.quarris.ppfluids.network.FluidButtonPayload;
 import net.minecraft.world.item.Item;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.fluids.capability.templates.FluidHandlerItemStack;
-import net.neoforged.neoforge.network.event.RegisterPayloadHandlerEvent;
-import net.neoforged.neoforge.network.registration.IPayloadRegistrar;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 
-@Mod.EventBusSubscriber(modid = ModRef.ID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = ModRef.ID, bus = EventBusSubscriber.Bus.MOD)
 public class RegistryEvents {
 
     // Yes, this is Java so the names have to be this verbose.
@@ -32,14 +31,14 @@ public class RegistryEvents {
     }
 
     @SubscribeEvent
-    public static void registerPayloads(RegisterPayloadHandlerEvent event) {
-        IPayloadRegistrar registrar = event.registrar(ModRef.ID);
-        registrar.play(FluidButtonPayload.ID, FluidButtonPayload::new, FluidButtonPayload::onMessage );
+    public static void registerPayloads(RegisterPayloadHandlersEvent event) {
+        var registrar = event.registrar(ModRef.ID);
+        registrar.playBidirectional(FluidButtonPayload.TYPE, FluidButtonPayload.CODEC, FluidButtonPayload::onMessage);
     }
 
     @SubscribeEvent
     public static void attachCapabilities(RegisterCapabilitiesEvent event) {
-        event.registerItem(Capabilities.FluidHandler.ITEM, (stack, ctx) -> new FluidHandlerItemStack.Consumable(stack, Integer.MAX_VALUE), ItemSetup.FLUID_HOLDER.get());
+        event.registerItem(Capabilities.FluidHandler.ITEM, (stack, ctx) -> new FluidHandlerItemStack.Consumable(DataComponentSetup.FLUID_CONTENT_DATA, stack, Integer.MAX_VALUE), ItemSetup.FLUID_HOLDER.get());
         event.registerBlockEntity(Registry.pipeConnectableCapability, BlockEntitySetup.FLUID_PIPE.get(), (e, d) -> e);
     }
 }

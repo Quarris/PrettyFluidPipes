@@ -50,7 +50,7 @@ public class FluidPipeBlockEntity extends PipeBlockEntity {
                 continue;
 
             if (!force && this.streamModules().filter(m -> m.getRight() instanceof IFluidModule)
-                .anyMatch(m -> !((IFluidModule) m.getRight()).canAcceptItem(m.getLeft(), this, FluidItem.createItemFromFluid(fluid, false), dir, tank))) {
+                .anyMatch(m -> !((IFluidModule) m.getRight()).canAcceptItem(m.getLeft(), this, FluidItem.createItemFromFluid(fluid), dir, tank))) {
                 continue;
             }
             int amountFilled = tank.fill(fluid, IFluidHandler.FluidAction.SIMULATE);
@@ -85,7 +85,7 @@ public class FluidPipeBlockEntity extends PipeBlockEntity {
                 }
 
                 if (!toInsert.isEmpty()) {
-                    return Pair.of(tankPos, FluidItem.createItemFromFluid(toInsert, false));
+                    return Pair.of(tankPos, FluidItem.createItemFromFluid(toInsert));
                 }
             }
         }

@@ -15,6 +15,7 @@ import dev.quarris.ppfluids.registry.MenuSetup;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
@@ -26,8 +27,8 @@ public class FluidExtractionModuleItem extends FluidModuleItem implements IFluid
     private final boolean preventOversending;
     public final int filterSlots;
 
-    public FluidExtractionModuleItem(String name, ModuleTier tier) {
-        super(name);
+    public FluidExtractionModuleItem(String name, ModuleTier tier, Item.Properties properties) {
+        super(name, properties);
         this.maxExtraction = tier.forTier(500, 2000, 8000);
         this.speed = tier.forTier(40, 20, 10);
         this.filterSlots = tier.forTier(2, 4, 8);
@@ -46,17 +47,17 @@ public class FluidExtractionModuleItem extends FluidModuleItem implements IFluid
             if (tank == null)
                 continue;
 
-            FluidStack fluid = tank.drain(this.maxExtraction, IFluidHandler.FluidAction.SIMULATE);
-            if (fluid.isEmpty())
+            FluidStack toExtract = tank.drain(this.maxExtraction, IFluidHandler.FluidAction.SIMULATE);
+            if (toExtract.isEmpty())
                 continue;
 
-            if (!filter.isPipeFluidAllowed(fluid))
+            if (!filter.isPipeFluidAllowed(toExtract))
                 continue;
 
-            FluidStack remain = PipeNetworkUtil.routeFluid(fluidPipe.getLevel(), fluidPipe.getBlockPos(), fluidPipe.getBlockPos().relative(dir), fluid, FluidPipeItem::new, this.preventOversending);
+            FluidStack remainder = PipeNetworkUtil.routeFluid(fluidPipe.getLevel(), fluidPipe.getBlockPos(), fluidPipe.getBlockPos().relative(dir), toExtract, FluidPipeItem::new, this.preventOversending);
 
-            if (remain.getAmount() != fluid.getAmount()) {
-                tank.drain(fluid.getAmount() - remain.getAmount(), IFluidHandler.FluidAction.EXECUTE);
+            if (remainder.getAmount() != toExtract.getAmount()) {
+                tank.drain(toExtract.getAmount() - remainder.getAmount(), IFluidHandler.FluidAction.EXECUTE);
                 return;
             }
         }
