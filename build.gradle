@@ -90,6 +90,8 @@ dependencies {
 
     localRuntime "curse.maven:ScalableCatsForce-320926:${scalable_cats_force_version}"
     localRuntime "curse.maven:LargeTanks-291006:${tank_version}"
+    localRuntime "curse.maven:IndustrialForegoing-266515:${if_version}"
+    localRuntime "curse.maven:Titanium-287342:${titanium_version}"
 
     localRuntime "mezz.jei:jei-${mc_version}-neoforge:${jei_version}"
 }
