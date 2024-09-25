@@ -142,6 +142,7 @@ curseforge {
         changelogType = "markdown"
         releaseType = release_type
         addGameVersion mc_version // Add the Minecraft versions you're targeting
+        addGameVersion "NeoForge" // Add the Minecraft versions you're targeting
         relations {
             requiredDependency "pretty-pipes"
         }
