@@ -1,0 +1,26 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "key": {
+        "L": {
+            "id": "minecraft:lapis_block"
+        },
+        "P": {
+            "id": "minecraft:sticky_piston"
+        },
+        "M": {
+            "id": "prettypipes:blank_module"
+        },
+        "E": {
+            "id": "minecraft:ender_pearl"
+        }
+    },
+    "pattern": [
+        " P ",
+        "LML",
+        " E "
+    ],
+    "result": {
+        "count": 1,
+        "id": "ppfluids:low_fluid_retrieval_module"
+    }
+}

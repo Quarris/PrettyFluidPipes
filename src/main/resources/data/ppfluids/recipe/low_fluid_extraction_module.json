@@ -1,22 +1,23 @@
 {
     "type": "minecraft:crafting_shaped",
-    "pattern": [
-        " H ",
-        "LML",
-        " L "
-    ],
     "key": {
         "L": {
             "item": "minecraft:lapis_lazuli"
         },
-        "H": {
-            "item": "minecraft:hopper"
+        "P": {
+            "item": "minecraft:piston"
         },
         "M": {
             "item": "prettypipes:blank_module"
         }
     },
+    "pattern": [
+        " P ",
+        "LML",
+        " L "
+    ],
     "result": {
-        "item": "ppfluids:low_fluid_filter_module"
+        "count": 1,
+        "id": "ppfluids:low_fluid_extraction_module"
     }
 }
