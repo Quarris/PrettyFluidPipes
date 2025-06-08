@@ -1,0 +1,25 @@
+{
+    "block.ppfluids.fluid_pipe": "液体パイプ",
+    "item.ppfluids.fluid_item": "液体コンテナ",
+
+    "item.ppfluids.low_fluid_extraction_module": "低液体搬出モジュール",
+    "item.ppfluids.medium_fluid_extraction_module": "中液体搬出モジュール",
+    "item.ppfluids.high_fluid_extraction_module": "高液体搬出モジュール",
+    "item.ppfluids.low_fluid_filter_module": "低液体フィルターモジュール",
+    "item.ppfluids.medium_fluid_filter_module": "中液体フィルターモジュール",
+    "item.ppfluids.high_fluid_filter_module": "高液体フィルターモジュール",
+    "item.ppfluids.low_fluid_retrieval_module": "低液体要求モジュール",
+    "item.ppfluids.medium_fluid_retrieval_module": "中液体要求モジュール",
+    "item.ppfluids.high_fluid_retrieval_module": "高液体要求モジュール",
+    "item.ppfluids.fluid_limiter_module": "液体リミッターモジュール",
+    "info.prettypipes.fluid_extraction_module": "隣接するタンクから液体を搬出します\nフィルターと搬出速度はティアによって異なります\nすべてのティアで過剰送出を防止します",
+    "info.prettypipes.fluid_filter_module": "パイプから隣接するタンクへの流れを制限します\nフィルターをできる量はティアによって異なります",
+    "info.prettypipes.fluid_retrieval_module": "ネットワーク内の他のタンクに液体を要求します\nフィルターと搬出速度はティアによって異なります\nすべてのティアで過剰送信を防止します",
+    "info.prettypipes.fluid_limiter_module": "隣接するタンクに入る液体の量を制限します\n過剰搬出を自動的に防止します",
+
+    "info.ppfluids.fluid_item.usage": "液体タンクに私を使って、私の内容物を入力してください!",
+
+    "info.ppfluids.limit_buckets_on": "バケツ(s)",
+    "info.ppfluids.limit_buckets_off": "ミリバケツ(s)",
+    "info.ppfluids.limited_amount": "リミット:"
+}
