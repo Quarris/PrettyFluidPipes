@@ -6,7 +6,8 @@
   "refmap": "ppfluids.refmap.json",
   "mixins": [
     "DirectionSelectorAccessor",
-    "DirectionSelectorMixin"
+    "DirectionSelectorMixin",
+    "PipeFrameEntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1
