@@ -208,6 +208,7 @@ modrinth {
     versionType = release_type
     uploadFile = jar
     gameVersions = [mc_version] // Add the Minecraft versions you're targeting
+    loaders = ["neoforge"]
     changelog = file('changelog.md').text
     dependencies {
         required.project "pretty-pipes"
