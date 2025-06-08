@@ -20,21 +20,21 @@ config = "${mod_id}_base.mixins.json"
 [[accessTransformers]]
 file = "META-INF/accesstransformer.cfg"
 
-[[dependencies.${ mod_id }]]
+[[dependencies.${mod_id}]]
 modId = "neoforge"
 type = "required"
 versionRange = "${neo_version_range}"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.${ mod_id }]]
+[[dependencies.${mod_id}]]
 modId = "minecraft"
 type = "required"
 versionRange = "${mc_version_range}"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.${ mod_id }]]
+[[dependencies.${mod_id}]]
 modId = "prettypipes"
 type = "required"
 versionRange = "[0,)"

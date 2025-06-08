@@ -3,6 +3,7 @@ package dev.quarris.ppfluids.datagen;
 import dev.quarris.ppfluids.ModRef;
 import dev.quarris.ppfluids.datagen.server.BlockTagGen;
 import dev.quarris.ppfluids.datagen.server.LootTableGen;
+import dev.quarris.ppfluids.datagen.server.RecipesGen;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
@@ -28,6 +29,7 @@ public class DataGenEvents {
         CompletableFuture<HolderLookup.Provider> registries = event.getLookupProvider();
 
         data.addProvider(event.includeServer(), new BlockTagGen(output, registries, fileHelper));
+        data.addProvider(event.includeServer(), new RecipesGen(output, registries));
         event.getGenerator().addProvider(event.includeServer(), new LootTableGen(
             output,
             Collections.emptySet(),

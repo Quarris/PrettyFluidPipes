@@ -102,7 +102,8 @@ public class FluidPipeItem extends PipeItem {
                 if (handler == null)
                     return this.stack;
 
-                return FluidItem.insertFluid(handler, this.stack, false);
+
+                return FluidItem.insertFluid(handler, this.stack);
             }
         }
 

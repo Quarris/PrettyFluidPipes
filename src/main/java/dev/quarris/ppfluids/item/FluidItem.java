@@ -35,9 +35,14 @@ public class FluidItem extends Item {
         return FluidUtil.getFluidHandler(item).map(handler -> handler.getFluidInTank(0)).orElse(FluidStack.EMPTY).copy();
     }
 
-    public static ItemStack insertFluid(IFluidHandler handler, ItemStack fluidItem, boolean simulate) {
+    public static ItemStack insertFluid(IFluidHandler handler, ItemStack fluidItem) {
         FluidStack fluidStack = FluidItem.getFluidCopyFromItem(fluidItem);
-        int filled = handler.fill(fluidStack, simulate ? IFluidHandler.FluidAction.SIMULATE : IFluidHandler.FluidAction.EXECUTE);
+        int filled = handler.fill(fluidStack, IFluidHandler.FluidAction.SIMULATE);
+        if (filled <= 0) {
+            return fluidItem;
+        }
+
+        filled = handler.fill(fluidStack, IFluidHandler.FluidAction.EXECUTE);
         fluidStack.shrink(filled);
 
         if (fluidStack.isEmpty())
