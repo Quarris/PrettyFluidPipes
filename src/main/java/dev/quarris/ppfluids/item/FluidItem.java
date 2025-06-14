@@ -34,11 +34,9 @@ public class FluidItem extends ItemFluidContainer {
                 .append(": ").append(String.valueOf(fluidStack.getAmount())));
     }
 
-    public static ItemStack createItemFromFluid(FluidStack fluid, boolean simulate) {
+    public static ItemStack createItemFromFluid(FluidStack fluid) {
         ItemStack item =  new ItemStack(ItemSetup.FLUID_HOLDER.get());
         int filled = FluidUtil.getFluidHandler(item).map(tank -> tank.fill(fluid, IFluidHandler.FluidAction.EXECUTE)).orElse(0);
-        if (!simulate)
-            fluid.grow(filled);
         return item;
     }
 
@@ -54,7 +52,7 @@ public class FluidItem extends ItemFluidContainer {
         if (fluidStack.isEmpty())
             return ItemStack.EMPTY;
 
-        return FluidItem.createItemFromFluid(fluidStack, false);
+        return FluidItem.createItemFromFluid(fluidStack);
     }
 
     @Override

@@ -4,6 +4,8 @@ plugins {
     id 'net.minecraftforge.gradle' version '5.1.+'
     id 'org.spongepowered.mixin' version '0.7.+'
     id 'org.parchmentmc.librarian.forgegradle' version '1.+'
+    id 'com.matthewprenger.cursegradle' version '1.4.0'
+    id 'com.modrinth.minotaur' version '2.+'
 }
 
 version = mod_version
@@ -138,4 +140,38 @@ publishing {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
+}
+
+curseforge {
+    project {
+        apiKey = System.getenv('CURSEFORGE_API_PUBLISH')
+        id = '479142'
+        changelog = file('changelog.md').text
+        changelogType = "markdown"
+        releaseType = release_type
+        addGameVersion mc_version // Add the Minecraft versions you're targeting
+        addGameVersion "NeoForge" // Add the Minecraft versions you're targeting
+        addGameVersion "Forge" // Add the Minecraft versions you're targeting
+        relations {
+            requiredDependency "pretty-pipes"
+        }
+        mainArtifact(jar) {
+            displayName = "$mod_name v$project.version"
+        }
+    }
+}
+
+modrinth {
+    token = System.getenv('MODRINTH_API_PUBLISH')
+    projectId = 'pretty-pipes-fluids'
+    versionNumber = project.version
+    versionName = "$mod_name v$project.version"
+    versionType = release_type
+    uploadFile = jar
+    gameVersions = [mc_version] // Add the Minecraft versions you're targeting
+    loaders = ["neoforge", "forge"]
+    changelog = file('changelog.md').text
+    dependencies {
+        required.project "pretty-pipes"
+    }
 }

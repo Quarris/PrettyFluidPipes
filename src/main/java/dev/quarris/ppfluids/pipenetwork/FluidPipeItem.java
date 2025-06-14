@@ -84,7 +84,7 @@ public class FluidPipeItem extends PipeItem {
             // second time: we arrived at our input chest, it is full, so we try to find a different goal location
             FluidStack remain = PipeNetworkUtil.routeFluid(currPipe.getLevel(), currPipe.getBlockPos(), this.destInventory, FluidItem.getFluidCopyFromItem(this.stack), (stack, speed) -> this, false);
             if (!remain.isEmpty())
-                this.drop(currPipe.getLevel(), FluidItem.createItemFromFluid(remain, false));
+                this.drop(currPipe.getLevel(), FluidItem.createItemFromFluid(remain));
         } else {
             // if all re-routing attempts fail, we drop
             this.drop(currPipe.getLevel(), this.stack);

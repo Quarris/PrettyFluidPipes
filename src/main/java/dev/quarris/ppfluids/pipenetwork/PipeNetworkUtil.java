@@ -101,7 +101,7 @@ public class PipeNetworkUtil {
             IFluidHandler handler = location.getFluidHandler(level);
             FluidStack stack = handler.getFluidInTank(slot).copy();
             FluidStack extracted = handler.drain(stack, IFluidHandler.FluidAction.SIMULATE);
-            ItemStack fluidItem = FluidItem.createItemFromFluid(extracted, false);
+            ItemStack fluidItem = FluidItem.createItemFromFluid(extracted);
             if (network.routeItemToLocation(location.pipePos, location.getPos(), destPipe, destInventory, fluidItem, speed -> new FluidPipeItem(fluidItem, speed))) {
                 handler.drain(extracted, IFluidHandler.FluidAction.EXECUTE);
                 amount -= extracted.getAmount();
