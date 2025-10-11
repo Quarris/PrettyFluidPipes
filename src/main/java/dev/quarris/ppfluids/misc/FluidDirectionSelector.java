@@ -11,6 +11,8 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.client.gui.widget.ExtendedButton;
 
 import java.util.List;
@@ -21,6 +23,7 @@ public class FluidDirectionSelector extends DirectionSelector {
         super(stack, pipe);
     }
 
+    @OnlyIn(Dist.CLIENT)
     @Override
     public AbstractWidget getButton(int x, int y) {
         DirectionSelectorAccessor accessor = (DirectionSelectorAccessor) this;
